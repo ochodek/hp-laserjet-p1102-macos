@@ -1,5 +1,17 @@
 # Changelog / Přehled vydání
 
+## 1.7, 2026-10-01 (driver version 1.7)
+
+Stable release following 1.7-rc1. Adds an English/Czech guided installer, upgrade and removal safeguards, cropped-PDF correctness, a hard serialized-PDF output limit and expanded package/installer tests. The final review corrected the economy-mode validation: EconoMode with density 1 can lose the lightest gray detail.
+
+Stabilní vydání po 1.7-rc1 přidává český a anglický instalátor, ochrany při aktualizaci a odinstalaci, správný výřez PDF a limit celého výstupu. Úsporný režim se sytostí 1 může ztratit nejsvětlejší šedé detaily.
+
+Native USB toner/status utility and CUPS ReportLevels; additional media, paper sizes, custom sizes, FastRes quality, EconoMode, density and jam recovery. Native power/quiet controls, internal-page commands, privacy-limited diagnostics, PDF watermark/booklet and manual duplex. Default print data retain 1.6 calibration. Physical validation and remaining coverage limits are tracked in [REVIEW.md](REVIEW.md).
+
+The installed GUI passed physical manual-duplex and watermarked-booklet tests. Both quality/economy scheduler jobs completed after fixing CUPS boolean serialization; the user confirmed readable output, lighter economy printing and the internal supplies page showing 60% toner on 1 October 2026. Long utility instructions wrap, and macOS Supply Levels showed a fresh toner value. Licence notices, complete matching source, package checks accompany the installer.
+
+Nativní nástroj doplňuje toner, nastavení tiskárny a PDF postupy. Uživatel fyzicky potvrdil ruční duplex a brožuru s vodoznakem. Opravené zalamování textu, volby CUPS a balení licencí prošly kontrolami; uživatel potvrdil i poslední zkoušky kvality, světlejší úsporný tisk a interní stránku se stavem toneru 60 %. Podrobnosti uvádí REVIEW.md.
+
 ## 1.6, 2026-10-01
 
 First public release of this vibe-coded community project.

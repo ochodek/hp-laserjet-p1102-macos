@@ -1,38 +1,31 @@
-# Security
+# Security, 1.7
 
 **English** | [Česky](SECURITY.cs.md)
 
-Local review performed on 1 October 2026. This vibe-coded project was developed with AI assistance. The checks below found no intentionally malicious behavior, but they are not an independent security audit or a guarantee that every defect has been found.
+This vibe-coded project was developed with AI assistance. An internal code and security review was performed on 1 October 2026; findings, fixes, evidence and coverage limits are in [REVIEW.md](REVIEW.md). It is not an independent audit or a guarantee that every defect has been found.
 
-## Installed code and permissions
+## Runtime and permissions
 
-The installed program contains the CUPS adapter, ZjStream encoder, and JBIG encoder. It links only to system `libcups.2.dylib` and `libSystem.B.dylib`. It contains no network client, telemetry, updater, shell commands, downloads, keychain access, or background service. It installs no kernel extension and modifies no printer firmware. macOS handles USB transport.
+The native raster filter validates monochrome CUPS input and uses the pinned foo2zjs/JBIG encoder. It links to system libcups and libSystem. The new command filter and CLI use Foundation and IOKit; P1102 Utility additionally uses Cocoa, PDFKit and PrintCore. All release executables are ARM64.
 
-Unused CLI paths, color-input parsers, and the JBIG decoder are removed by the linker. The release filter was checked for process-launching, network/socket, and decoder symbols. It creates no temporary files; CUPS supplies the raster input path. Usernames and job titles are not inserted into the printer protocol.
+Runtime code has no network client, telemetry, updater, shell execution, download logic, credential/keychain access, persistent background agent, kernel extension, firmware modification or factory reset. HTTP-framed management messages travel over USB. The application talks to two model-specific USB interfaces without seizing or resetting them. Commands and settings are allowlisted; users' names and document titles are not put in printer commands.
 
-The filter is installed as `root:wheel`, mode `0755`, without a setuid bit. The installer discovers a connected USB P1102 and creates its own queue; updates refresh only that queue's PPD and resolution. It does not replace the HP queue or select a new default. Device URIs are quoted arguments, never evaluated as shell commands. CUPS protections, Gatekeeper, and SIP are not disabled.
+The installer requires administrator permission for root-owned driver files, the application and its own CUPS queue. Executables use mode 0755 with no setuid bit. It preserves the original HP queue and default printer choice. The application runs as the logged-in user and needs no administrator permission for normal use. macOS handles document spooling. Installation rejects conflicting queues, unrelated utility bundles and symbolic links in owned destinations. The supplied uninstaller removes only named files, checks queue/application identity and refuses pending native jobs. Removal contract tests use mocks; the working installation was not destructively removed during validation.
 
-Apart from the standard installer receipt and CUPS queue configuration, the payload contains:
+The payload contains the raster filter, `commandtop1102`, `p1102ctl`, license and complete source archive under `/Library/Printers/P1102Native`, the PPD under `/Library/Printers/PPDs/Contents/Resources`, and `/Applications/P1102 Utility.app`. No launch agent/daemon is installed. UI automation permission used during development is not a driver requirement.
 
-* `/Library/Printers/P1102Native/rastertop1102`
-* `/Library/Printers/P1102Native/LICENSE`
-* `/Library/Printers/P1102Native/Source.tar.gz`
-* `/Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd`
+## Input handling and privacy
 
-## Checks performed
+* Raster geometry, dimensions, bit depth, page size, media/source/quality codes, copies and print-option ranges are validated before use. Page buffers are bounded by supported physical sizes. Truncated pages fail instead of reporting completion.
+* USB transfers have deadlines; failed reads never expose uninitialized buffers. HTTP responses have a 512 KiB total bound, 8 KiB header bound and strict length/chunk framing. Unknown/duplicate toner values are not converted into percentages.
+* XML is UTF-8, with DTD/entity declarations rejected, external entity loading disabled, depth/node/text limits and exact paths for current versus previous cartridge data.
+* PDF inputs are user-selected, printable and unlocked, with file/page/output limits. The original is not overwritten by preparation. Exports use explicit save dialogs; printing uses system spooling. The 256 MiB serialized-output limit applies to each write and finalization. It is not a total-memory or CPU limit. Cropping is not redaction; clipped content may remain in exports. The app is not App Sandbox isolated. PDFKit and the OS are trusted dependencies whose internals are outside this audit.
+* GUI diagnostic export selects specific fields and omits serial numbers, usernames, file paths and document contents. CLI status intentionally includes device identity, so redact it before sharing. Development USB captures, print files and photographs are ignored by Git and excluded from the source package.
 
-* Adapter compilation with `-Wall -Wextra -Werror`; Clang Static Analyzer reported no findings in that adapter.
-* Native ARM64 architecture and valid ad-hoc code signature.
-* Pinned vendored-source revision and SHA-256 checksums; expanded package contents and installed files compared with the build.
-* Eight tests decode actual JBIG output and check complete images, white padding, edge preservation, copy counts, polarity, and printer mode. All 256 tone populations and a separate image are compared with measured HP output.
-* Fractional CUPS Raster v2 geometry is covered. Nonfinite, inverted, out-of-page and extreme header values, empty jobs, and truncated raster data are rejected.
-* The same tests passed under AddressSanitizer and UndefinedBehaviorSanitizer. Leak detection was disabled in that run.
-* The local Apple rasterizer and filter path was exercised for all five paper sizes. Actual A4 prints were compared; data tests do not establish physical alignment on every printer.
+## Checks and limits
 
-## Vendored-code findings and limits
+Strict warnings and Clang Static Analyzer cover first-party source. Raster, protocol, HTTP/XML and PDF contract suites run normally and under AddressSanitizer/UndefinedBehaviorSanitizer, with leak detection disabled. See REVIEW.md for actual outcomes and the distinction between direct USB checks, scheduler integration and physical printing.
 
-Analysis of the complete `jbig.c` reported 13 candidates involving unused assignments, general zero-size allocations, indexed initialization, and decoder paths. The decoder is not linked into the installed filter. The encoder receives validated positive dimensions, one plane, fixed strip height and ordering. The relevant indexed initialization fills all three entries. These candidates were not reproduced in the used path; this is not a claim that the entire library is defect-free.
+The pinned upstream source and hashes remain unchanged. Linker dead stripping removes the unused foo2zjs CLI, color parsers and JBIG decoder from the raster executable. Earlier analysis of all `jbig.c` reported 13 candidates involving dead stores, zero-size allocations, initialization and decoder paths. The used encoder receives validated positive dimensions, one plane and fixed JBIG settings; relevant indexed initialization fills all entries. These candidates were not reproduced in the used path. Historical `sprintf` warnings are in unused color paths absent from the release filter. This is not a claim that the whole upstream library is defect-free.
 
-The compiler also warns about historical `sprintf` calls in unused color paths of foo2zjs. Those paths and calls are absent from the installed program. Vendored source files are retained unchanged for comparison with the pinned revision.
-
-The installer is **not Developer ID signed or notarized**. Ad-hoc signing is not publisher verification. Release checksums establish file integrity, not independent trust in the author. macOS system libraries and the printing stack remain dependencies. Tests do not cover every possible document or malformed input.
+The package is **not Developer ID signed or notarized**. Ad-hoc signatures do not identify or certify a publisher. SHA-256 checksums detect modified downloads but do not establish independent trust. Do not disable Gatekeeper or SIP to install it. Future macOS support depends on Apple retaining CUPS/PPD, rasterization, IOKit and USB functionality. Physical testing of every medium, error state and supported OS version has not been performed.

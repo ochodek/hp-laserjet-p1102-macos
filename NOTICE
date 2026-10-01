@@ -1,0 +1,41 @@
+P1102 Native
+Independent community software for HP LaserJet Professional P1102 printers.
+Maintained by Marek Ochodek and contributors, 2026. Developed with AI assistance
+(a vibe-coded project). No affiliation with, sponsorship by, or approval from HP
+or Apple is claimed. HP and LaserJet are trademarks of HP; Apple, macOS and
+Rosetta are trademarks of Apple. These names identify compatible products.
+No trademark licence is granted by this project's software licence.
+
+Project-specific code, scripts, PPD, documentation and test data are offered
+under GNU GPL version 2 or, at your option, any later version, to the extent
+copyright or similar rights apply. The full licence is in LICENSE. This notice
+adds no restrictions to the GPL. No warranty is provided, to the extent allowed
+by applicable law. It does not exclude rights that cannot lawfully be excluded.
+
+Third-party components:
+- foo2zjs: Rick Richardson, Robert Szalai and contributors, GPL-2.0-or-later.
+- JBIG-KIT 2.1: Copyright 1995-2014 Markus Kuhn, GPL-2.0-or-later.
+- zjsdecode (test tool): Copyright 2003-2006 Rick Richardson,
+  GPL-2.0-or-later. Not installed as a runtime executable.
+The unmodified files and their original notices are in vendor/foo2zjs.
+The exact upstream revision and hashes are in vendor/UPSTREAM.txt and
+vendor/SHA256SUMS. src/job.h adapts the foo2zjs P1102 job framing; project-specific
+adaptation dated 2026-10-01. No claim of exclusive authorship over this code.
+
+The installer includes matching complete source, dependencies, tests and build
+and installation scripts in /Library/Printers/P1102Native/Source.tar.gz.
+The source archive is also distributed alongside each release installer.
+No proprietary HP executable, firmware, manual, logo, font or SDK is included.
+macOS libraries and frameworks are supplied by the operating system, not this
+package. Measured compatibility data is described in tests/TONE_REFERENCE.md.
+
+Česky:
+P1102 Native je nezávislý komunitní projekt pro tiskárny HP LaserJet Professional
+P1102. Spravuje jej Marek Ochodek a přispěvatelé, 2026. Vznikl s pomocí AI
+(vibe-coded). Nejde o produkt schválený, podporovaný nebo vydaný HP či Apple.
+Názvy výrobců a výrobků označují kompatibilitu; licence neposkytuje práva
+k jejich ochranným známkám. Licence projektu je GPL verze 2 nebo novější.
+Původní autoři a licence převzatých částí jsou uvedeni výše a zachováni ve vendor/.
+Software je poskytován bez záruky v rozsahu přípustném právem. Tím nejsou
+omezena práva, která nelze zákonně vyloučit. Kompletní odpovídající zdroje jsou
+součástí instalátoru i samostatně u vydání. Podrobnosti: LICENSE a NOTICE.
