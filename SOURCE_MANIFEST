@@ -12,6 +12,7 @@ SECURITY.cs.md
 SECURITY.md
 SOURCE_MANIFEST
 build.sh
+docs/queue-validation.md
 installer/Distribution.xml
 installer/Uninstall.command
 installer/components.plist
@@ -35,6 +36,8 @@ src/halftone.h
 src/job.h
 src/pdf-tools.h
 src/pdf-tools.m
+src/queue-check.c
+src/queue-check.h
 src/rastertop1102.c
 src/usb.c
 src/usb.h
@@ -47,11 +50,13 @@ tests/hp-spatial-reference.json
 tests/hp-tone-reference.csv
 tests/pdf_limit_tests.m
 tests/pdf_tests.m
+tests/queue_tests.c
 tests/raster_fixture.c
 tests/sanitize.sh
 tests/test_build.py
 tests/test_driver.py
 tests/test_installer.py
+tests/test_queue_transport.py
 tests/test_uninstall.py
 tools/archive-source.sh
 tools/render-app-icon.m

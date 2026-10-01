@@ -6,17 +6,23 @@ export LC_ALL
 queue=HP_LaserJet_P1102_Native
 ppd=/Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd
 . "$(/usr/bin/dirname "$0")/check-queue"
-if /usr/bin/lpstat -v "$queue" >/dev/null 2>&1; then
-    /usr/sbin/lpadmin -p "$queue" -P "$ppd"
+if [ "$queue_state" = present ]; then
+    /usr/sbin/lpadmin -h /private/var/run/cupsd -p "$queue" -P "$ppd"
     exit 0
 fi
-devices=$(/usr/sbin/lpinfo -v) || exit 1
+devices=$(/usr/sbin/lpinfo -h /private/var/run/cupsd -v) || exit 1
 uri=$(printf '%s\n' "$devices" | /usr/bin/awk '
     $1 == "direct" && $2 ~ /^usb:\/\/Hewlett-Packard\/HP%20LaserJet%20Professional%20P1102\?/ { uri=$2; count++ }
     END { if (count == 1) print uri }')
 if [ -n "$uri" ]; then
-    /usr/sbin/lpadmin -p "$queue" -E -v "$uri" -P "$ppd" \
+    # Discovery can take seconds. Recheck identity/jobs before configuring anything.
+    . "$(/usr/bin/dirname "$0")/check-queue"
+    if [ "$queue_state" = present ]; then
+        /usr/sbin/lpadmin -h /private/var/run/cupsd -p "$queue" -P "$ppd"
+        exit 0
+    fi
+    /usr/sbin/lpadmin -h /private/var/run/cupsd -p "$queue" -E -v "$uri" -P "$ppd" \
         -D 'HP LaserJet P1102 Native' -o printer-is-shared=false
 else
-    printf '%s\n' 'Driver installed. Automatic setup requires exactly one connected P1102. Add the intended printer in Printers & Scanners using HP LaserJet P1102 Native ARM64, 1.7.1.'
+    printf '%s\n' 'Driver installed. Automatic setup requires exactly one connected P1102. Add the intended printer in Printers & Scanners using HP LaserJet P1102 Native ARM64, 1.7.2.'
 fi

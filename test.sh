@@ -15,6 +15,10 @@ build/pdf-tests
 xcrun clang -arch arm64 -fobjc-arc -Wall -Wextra -Werror -DP1102_PDF_OUTPUT_LIMIT=4096 \
     src/pdf-tools.m tests/pdf_limit_tests.m -framework Cocoa -framework PDFKit -o build/pdf-limit-tests
 build/pdf-limit-tests
+xcrun clang -arch arm64 -std=c11 -Wall -Wextra -Werror -DP1102_QUEUE_CHECK_TESTS \
+    src/queue-check.c tests/queue_tests.c -lcups -o build/queue-tests
+build/queue-tests
+python3 tests/test_queue_transport.py
 python3 tests/test_installer.py
 python3 tests/test_uninstall.py
 python3 tests/test_build.py

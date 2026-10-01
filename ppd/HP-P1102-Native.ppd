@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *FormatVersion: "4.3"
-*FileVersion: "1.7.1"
+*FileVersion: "1.7.2"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "P1102ARM.PPD"
@@ -8,7 +8,7 @@
 *Product: "(HP LaserJet Professional P1102)"
 *ModelName: "HP LaserJet P1102 Native"
 *ShortNickName: "HP P1102 Native"
-*NickName: "HP LaserJet P1102 Native ARM64, 1.7.1"
+*NickName: "HP LaserJet P1102 Native ARM64, 1.7.2"
 *PSVersion: "(3010.000) 0"
 *LanguageLevel: "3"
 *ColorDevice: False

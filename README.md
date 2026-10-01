@@ -10,21 +10,21 @@ The project started after a macOS upgrade left the legacy HP queue reporting **â
 
 **[Download the installer](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest)** | [Installation](#installation) | [Compatibility](#compatibility-and-validation) | [Report a problem](https://github.com/ochodek/hp-laserjet-p1102-macos/issues)
 
-## Version 1.7.1
+## Version 1.7.2
 
-Version 1.7.1 improves handling of incomplete raster input, USB/XML responses and source packaging, and adds an application icon. Physical print results below describe version 1.7; version 1.7.1 has automated validation.
+Version 1.7.2 fixes upgrades and removal on localized macOS by querying structured CUPS attributes, and stops safely when the scheduler cannot be verified or native jobs are pending. See the [cause, implementation and verification](docs/queue-validation.md). The raster/protocol implementation is unchanged. Physical workflow results below describe 1.7; one page printed with the installed 1.7.1 was also confirmed by the user.
 
 Native toner/status utility, paper and quality options, quiet/power settings, PDF booklets, watermarks and manual duplex. See the [feature comparison](FEATURES.md) and [review findings](REVIEW.md) for verified behavior and limits. The installer includes English/Czech guidance, GPL licence, upgrade checks and an explicit uninstaller.
 
 ## Installation
 
-1. Open [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) and download `HP-P1102-Native-1.7.1.pkg`. No compilation is needed.
+1. Open [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) and download `HP-P1102-Native-1.7.2.pkg`. No compilation is needed.
 2. Connect the powered-on P1102 by USB, directly or through a working adapter. Load A4 paper.
 3. Open the package and complete installation. macOS requires administrator authorization.
 4. Select **HP LaserJet P1102 Native** in the application's print dialog. Set it as your default in **System Settings, Printers & Scanners** if desired.
 5. Print one page to check your printer's output.
 
-Quit P1102 Utility and finish pending jobs before updating. The installer creates its own queue when it finds exactly one connected P1102. If the printer was disconnected during installation, add it in **Printers & Scanners**, choose **Use: Select Software**, and select **HP LaserJet P1102 Native ARM64, 1.7.1**. Re-running the installer with the printer connected is another option. Updates refresh this driver's PPD while retaining existing quality choices. A queue-name conflict with another printer stops installation; with multiple P1102 devices, choose the intended one manually. The original HP queue and default printer selection are preserved.
+Quit P1102 Utility and finish pending jobs before updating. The installer creates its own queue when it finds exactly one connected P1102. If the printer was disconnected during installation, add it in **Printers & Scanners**, choose **Use: Select Software**, and select **HP LaserJet P1102 Native ARM64** with the installed package version. Re-running the installer with the printer connected is another option. Updates refresh this driver's PPD while retaining existing quality choices. A queue-name conflict, pending native jobs or an unverifiable local CUPS service stops installation; with multiple P1102 devices, choose the intended one manually. The original HP queue and default printer selection are preserved.
 
 ### macOS security prompts
 

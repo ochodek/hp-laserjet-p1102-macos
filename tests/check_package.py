@@ -15,6 +15,7 @@ expected = {
     'Library/Printers/P1102Native/rastertop1102': root/'build/rastertop1102',
     'Library/Printers/P1102Native/commandtop1102': root/'build/commandtop1102',
     'Library/Printers/P1102Native/p1102ctl': root/'build/p1102ctl',
+    'Library/Printers/P1102Native/p1102-queue-check': root/'build/p1102-queue-check',
     'Library/Printers/P1102Native/LICENSE': root/'LICENSE',
     'Library/Printers/P1102Native/NOTICE': root/'NOTICE',
     'Library/Printers/P1102Native/uninstall.sh': root/'uninstall.sh',
@@ -37,17 +38,22 @@ with tempfile.TemporaryDirectory() as tmp:
         p=payload/name
         assert not p.is_symlink() and p.read_bytes()==source.read_bytes(), name
         assert not p.stat().st_mode & (stat.S_ISUID|stat.S_ISGID|stat.S_IWOTH), name
-        if name.endswith(('rastertop1102','commandtop1102','p1102ctl','P1102Utility')):
+        if name.endswith(('rastertop1102','commandtop1102','p1102ctl','p1102-queue-check','P1102Utility')):
             assert subprocess.check_output(['lipo','-archs',str(p)],text=True).strip()=='arm64'
             subprocess.run(['codesign','--verify','--strict',str(p)],check=True)
     info=ET.parse(component/'PackageInfo').getroot()
     assert info.attrib['relocatable']=='false' and info.attrib['install-location']=='/'
     distribution=ET.parse(expanded/'Distribution').getroot()
-    assert distribution.find("pkg-ref[@version]").attrib['version']==info.attrib['version']=='1.7.1'
+    assert distribution.find("pkg-ref[@version]").attrib['version']==info.attrib['version']=='1.7.2'
     assert len(info.find('relocate'))==0
     with (payload/'Applications/P1102 Utility.app/Contents/Info.plist').open('rb') as plist_file:
         assert plistlib.load(plist_file)['CFBundleIconFile']=='P1102Utility.icns'
-    assert {p.name for p in (component/'Scripts').iterdir()}=={p.name for p in (root/'scripts').iterdir()}
+    subprocess.run(['codesign','--verify','--strict',str(payload/'Applications/P1102 Utility.app')],check=True)
+    assert {p.name for p in (component/'Scripts').iterdir()}=={p.name for p in (root/'scripts').iterdir()}|{'p1102-queue-check'}
+    guard=component/'Scripts/p1102-queue-check'
+    assert guard.read_bytes()==(root/'build/p1102-queue-check').read_bytes()
+    assert guard.stat().st_mode & stat.S_IXUSR and not guard.stat().st_mode & (stat.S_ISUID|stat.S_ISGID|stat.S_IWOTH)
+    subprocess.run(['codesign','--verify','--strict',str(guard)],check=True)
     for p in (root/'scripts').iterdir(): assert (component/'Scripts'/p.name).read_bytes()==p.read_bytes()
     assert distribution.find('domains').attrib=={'enable_anywhere':'false','enable_currentUserHome':'false','enable_localSystem':'true'}
     assert distribution.find('pkg-ref/must-close/app').attrib['id']=='cz.marek.p1102-native.utility'
