@@ -8,11 +8,13 @@
 int main(int argc, char **argv)
 {
     int fractional = argc > 3 && strncmp(argv[3], "fractional", 10) == 0;
+    int tiny = argc > 3 && strncmp(argv[3], "tiny", 4) == 0;
+    int maximum = argc > 3 && strcmp(argv[3], "maximum") == 0;
     cups_raster_t *r = cupsRasterOpen(STDOUT_FILENO,
-        fractional ? CUPS_RASTER_WRITE_COMPRESSED : CUPS_RASTER_WRITE);
+        fractional || (tiny && strcmp(argv[3], "tiny-compressed") == 0) ? CUPS_RASTER_WRITE_COMPRESSED : CUPS_RASTER_WRITE);
     int ramp = argc > 3 && strcmp(argv[3], "ramp") == 0;
     int verification = argc > 3 && strcmp(argv[3], "verification") == 0;
-    for (int page = 0; page < (ramp || verification || fractional ? 1 : 2); page++) {
+    for (int page = 0; page < (ramp || verification || fractional || tiny || maximum ? 1 : 2); page++) {
         cups_page_header2_t h = {0};
         h.HWResolution[0] = 600;
         h.HWResolution[1] = 600;
@@ -20,6 +22,13 @@ int main(int argc, char **argv)
         h.ImagingBoundingBox[0] = h.ImagingBoundingBox[1] = 12;
         h.ImagingBoundingBox[2] = 285; h.ImagingBoundingBox[3] = 408;
         h.cupsWidth = 2275; h.cupsHeight = 3300 - page;
+        if (tiny) { h.cupsWidth = 8; h.cupsHeight = 4; }
+        if (maximum) {
+            h.PageSize[0] = h.ImagingBoundingBox[2] = 612;
+            h.PageSize[1] = h.ImagingBoundingBox[3] = 1008;
+            h.ImagingBoundingBox[0] = h.ImagingBoundingBox[1] = 0;
+            h.cupsWidth = 5100; h.cupsHeight = 8400;
+        }
         if (fractional) {
             h.ImagingBoundingBox[0] = h.ImagingBoundingBox[1] = 16;
             h.ImagingBoundingBox[2] = 280; h.ImagingBoundingBox[3] = 403;
@@ -48,6 +57,10 @@ int main(int argc, char **argv)
         unsigned char *row = malloc(h.cupsBytesPerLine);
         for (unsigned y = 0; y < h.cupsHeight; y++) {
             memset(row, h.cupsColorSpace == CUPS_CSPACE_W ? 255 : 0, h.cupsBytesPerLine);
+            if (maximum && (y == 0 || y == h.cupsHeight - 1)) {
+                row[0] ^= 0x80;
+                row[(h.cupsWidth - 1) / 8] ^= 0x80 >> ((h.cupsWidth - 1) % 8);
+            }
             if (fractional && h.cupsBitsPerPixel == 8 && (y == 0 || y == h.cupsHeight - 1))
                 row[0] = row[h.cupsWidth - 1] = h.cupsColorSpace == CUPS_CSPACE_W ? 0 : 255;
             if ((y >= 10 && y < 20) || y == h.cupsHeight - 1)

@@ -8,6 +8,7 @@ static NSUInteger cursor, writes;
 static unsigned failWrites;
 static int writeError;
 static NSString *level = @"60";
+static NSString *responseXML;
 p1102_usb *p1102_usb_open(const char *serial, char *error, size_t capacity)
 { (void)serial; (void)error; (void)capacity; return (p1102_usb *)1; }
 p1102_usb *p1102_usb_open_print(const char *serial, char *error, size_t capacity)
@@ -17,7 +18,7 @@ int p1102_usb_write(p1102_usb *usb, const void *bytes, size_t length)
     (void)usb; writes++; cursor = 0;
     if (failWrites) { failWrites--; return writeError; }
     NSString *request = [[NSString alloc] initWithBytes:bytes length:length encoding:NSASCIIStringEncoding];
-    NSString *xml = [request containsString:@"ConsumableConfigDyn"] ? [NSString stringWithFormat:@"<ConsumableConfigDyn><ConsumableInfo><ConsumablePercentageLevelRemaining>%@</ConsumablePercentageLevelRemaining><ProductNumber>CE285A</ProductNumber><ConsumableLifeState><ConsumableState>ok</ConsumableState></ConsumableLifeState></ConsumableInfo></ConsumableConfigDyn>",level] : @"<ProductUsageDyn><PrinterSubunit><TotalImpressions>1000</TotalImpressions></PrinterSubunit><ConsumableSubunit><Consumable><TotalImpressions>99</TotalImpressions><EstimatedPagesRemaining>300</EstimatedPagesRemaining><PreviousCartridgeData><TotalImpressions>999999</TotalImpressions></PreviousCartridgeData></Consumable></ConsumableSubunit></ProductUsageDyn>";
+    NSString *xml = responseXML ?: ([request containsString:@"ConsumableConfigDyn"] ? [NSString stringWithFormat:@"<ConsumableConfigDyn><ConsumableInfo><ConsumablePercentageLevelRemaining>%@</ConsumablePercentageLevelRemaining><ProductNumber>CE285A</ProductNumber><ConsumableLifeState><ConsumableState>ok</ConsumableState></ConsumableLifeState></ConsumableInfo></ConsumableConfigDyn>",level] : @"<ProductUsageDyn><PrinterSubunit><TotalImpressions>1000</TotalImpressions></PrinterSubunit><ConsumableSubunit><Consumable><TotalImpressions>99</TotalImpressions><EstimatedPagesRemaining>300</EstimatedPagesRemaining><PreviousCartridgeData><TotalImpressions>999999</TotalImpressions></PreviousCartridgeData></Consumable></ConsumableSubunit></ProductUsageDyn>");
     NSData *body = [xml dataUsingEncoding:NSUTF8StringEncoding];
     NSMutableData *response = [[NSString stringWithFormat:@"HTTP/1.1 200 OK\r\nContent-Length: %lu\r\n\r\n",(unsigned long)body.length] dataUsingEncoding:NSASCIIStringEncoding].mutableCopy;
     [response appendData:body]; mock = response; return 0;
@@ -41,10 +42,17 @@ int main(void)
     }
     error=nil; NSDictionary *xml=P1102XMLValues(D(@"<r xmlns:x='urn:x'><x:a>1</x:a><x:a>2</x:a><other><x:a>3</x:a></other></r>"),&error);
     assert((!error && [xml[@"r/a"] isEqual:@[@"1",@"2"]] && [xml[@"r/other/a"] isEqual:@[@"3"]]));
+    assert(P1102XMLValues(D(@"<?xml version='1.0' encoding='UTF-8'?><r/>"),&error));
+    for (NSString *bad in @[@"<?xml version='1.0' encoding='ISO-8859-1'?><r/>"]){error=nil;assert(!P1102XMLValues(D(bad),&error)&&error);}
+    NSMutableData *nul=[D(@"<r") mutableCopy]; unsigned char zero=0; [nul appendBytes:&zero length:1]; [nul appendData:D(@"/>")];
+    error=nil; assert(!P1102XMLValues(nul,&error)&&error);
     for (NSString *bad in @[@"<!DOCTYPE r [<!ENTITY x SYSTEM 'file:///etc/passwd'>]><r>&x;</r>",@"<!DOCTYPE r [<!ENTITY x 'abc'>]><r>&x;</r>",@"<r><a></r>"]){error=nil;assert(!P1102XMLValues(D(bad),&error)&&error);}
     NSMutableString *deep=[NSMutableString string]; for(int i=0;i<33;i++)[deep appendString:@"<r>"];for(int i=0;i<33;i++)[deep appendString:@"</r>"];
     error=nil; assert(!P1102XMLValues(D(deep),&error)&&error);
     error=nil; NSDictionary *s=P1102Supplies(nil,&error); assert(!error&&[s[@"tonerPercent"] isEqual:@60]&&[s[@"tonerState"] isEqual:@"ok"]);
+    responseXML=@"<ProductUsageDyn/>"; error=nil; assert(!P1102Supplies(nil,&error)&&error);
+    responseXML=@"<ConsumableConfigDyn/>"; error=nil; s=P1102Supplies(nil,&error); assert(s&&!error&&!s[@"tonerPercent"]);
+    responseXML=nil;
     for(NSString *bad in @[@"-1",@"101",@"unknown",@"60.0",@"",@"999999999999999999999",@"60</ConsumablePercentageLevelRemaining><ConsumablePercentageLevelRemaining>10"]){level=bad;error=nil;s=P1102Supplies(nil,&error);assert(s&&!s[@"tonerPercent"]);}
     level=@"60";error=nil; s=P1102Snapshot(nil,&error); assert([s[@"totalPages"] isEqual:@1000]&&[s[@"cartridgePages"] isEqual:@99]&&[s[@"estimatedPagesRemaining"] isEqual:@300]);
     /* A transient read-query write can recover once, without masking a

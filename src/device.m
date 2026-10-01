@@ -87,6 +87,7 @@ NSData *P1102HTTPBody(NSData *data, NSInteger *status, NSError **error)
 @property NSMutableArray<NSString *> *path;
 @property NSMutableArray<NSMutableString *> *text;
 @property NSMutableDictionary<NSString *, NSMutableArray<NSString *> *> *values;
+@property NSString *root;
 @property NSUInteger nodes;
 @end
 @implementation P1102XML
@@ -95,6 +96,7 @@ NSData *P1102HTTPBody(NSData *data, NSInteger *status, NSError **error)
 {
     (void)uri; (void)q; (void)attributes;
     if (_path.count >= 32 || ++_nodes > 4096 || name.length > 128) { [parser abortParsing]; return; }
+    if (!_path.count) _root = name;
     [_path addObject:name]; [_text addObject:[NSMutableString string]];
 }
 - (void)parser:(NSXMLParser *)parser foundCharacters:(NSString *)string
@@ -115,18 +117,32 @@ NSData *P1102HTTPBody(NSData *data, NSInteger *status, NSError **error)
     [_path removeLastObject]; [_text removeLastObject];
 }
 @end
-NSDictionary *P1102XMLValues(NSData *data, NSError **error)
+static P1102XML *parseXML(NSData *data, NSError **error)
 {
     /* LEDM is UTF-8 and needs no DTD. Reject declarations even though external
        entity resolution is disabled, also preventing internal entity expansion. */
     NSString *source = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    if (!source || data.length > limit || [source rangeOfString:@"<!DOCTYPE" options:NSCaseInsensitiveSearch].length ||
+    if (!source || data.length > limit || [data rangeOfData:[NSData dataWithBytes:"\0" length:1] options:0 range:NSMakeRange(0, data.length)].length || [source rangeOfString:@"<!DOCTYPE" options:NSCaseInsensitiveSearch].length ||
         [source rangeOfString:@"<!ENTITY" options:NSCaseInsensitiveSearch].length) { failure(error, @"Unsupported XML declaration or encoding."); return nil; }
+    NSUInteger offset = [source hasPrefix:@"\ufeff"] ? 1 : 0;
+    if (source.length > offset + 5 && [[source substringWithRange:NSMakeRange(offset, 5)] isEqual:@"<?xml"] &&
+        [[NSCharacterSet whitespaceAndNewlineCharacterSet] characterIsMember:[source characterAtIndex:offset + 5]]) {
+        NSRange end = [source rangeOfString:@"?>" options:0 range:NSMakeRange(offset + 5, source.length - offset - 5)];
+        NSString *declaration = end.location == NSNotFound ? nil : [source substringWithRange:NSMakeRange(offset, NSMaxRange(end) - offset)];
+        NSRegularExpression *encoding = [NSRegularExpression regularExpressionWithPattern:@"(?i)(?:^|\\s)encoding\\s*=\\s*(['\"])([^'\"]*)\\1" options:0 error:nil];
+        NSTextCheckingResult *match = [encoding firstMatchInString:declaration ?: @"" options:0 range:NSMakeRange(0, declaration.length)];
+        if (!declaration || (match && [[declaration substringWithRange:[match rangeAtIndex:2]] caseInsensitiveCompare:@"UTF-8"] != NSOrderedSame)) { failure(error, @"Unsupported XML declaration or encoding."); return nil; }
+    }
     NSXMLParser *parser = [[NSXMLParser alloc] initWithData:data];
     P1102XML *delegate = [P1102XML new];
     parser.delegate = delegate; parser.shouldProcessNamespaces = YES; parser.shouldResolveExternalEntities = NO;
     if (![parser parse]) { failure(error, @"Malformed or excessive printer XML."); return nil; }
-    return delegate.values;
+    return delegate;
+}
+NSDictionary *P1102XMLValues(NSData *data, NSError **error)
+{
+    P1102XML *xml = parseXML(data, error);
+    return xml ? xml.values : nil;
 }
 static double monotonic(void) { struct timespec t; clock_gettime(CLOCK_MONOTONIC, &t); return t.tv_sec + t.tv_nsec / 1e9; }
 static NSData *request(NSString *serial, NSString *resource, NSError **error)
@@ -169,7 +185,10 @@ static NSData *request(NSString *serial, NSString *resource, NSError **error)
 static NSDictionary *readXML(NSString *serial, NSString *resource, NSError **error)
 {
     NSData *data = request(serial, resource, error);
-    return data ? P1102XMLValues(data, error) : nil;
+    P1102XML *xml = data ? parseXML(data, error) : nil;
+    if (!xml) return nil;
+    if (![xml.root isEqual:resource]) { failure(error, @"Printer returned the wrong XML resource."); return nil; }
+    return xml.values;
 }
 static NSString *one(NSDictionary *xml, NSString *path) { NSArray *values = xml[path]; return values.count == 1 ? values[0] : nil; }
 static void copyText(NSMutableDictionary *out, NSString *key, NSDictionary *xml, NSString *path)

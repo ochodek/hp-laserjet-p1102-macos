@@ -229,8 +229,94 @@ class DriverTests(unittest.TestCase):
         self.assertIn(b'Truncated', result.stderr)
         self.assertNotIn(b'@PJL EOJ', result.stdout)
 
+    def test_partial_trailing_headers_never_silently_drop_a_page(self):
+        import struct
+        jobs = []
+        for kind in ['tiny', 'tiny-compressed', 'tiny-v1']:
+            raster = subprocess.check_output([str(ROOT/'build/raster_fixture'), '1', '3', 'tiny' if kind == 'tiny-v1' else kind])
+            header_size = 420 if kind == 'tiny-v1' else 1796
+            if kind == 'tiny-v1':
+                raster = struct.pack('=I', 0x52615374) + raster[4:424] + raster[1800:]
+            jobs.append((kind, raster, raster[4:4 + header_size]))
+        for kind, raster, header in jobs:
+            for count in [0, len(header)]:
+                result = run_filter(raster if count == 0 else raster + raster[4:])
+                self.assertEqual(result.returncode, 0, (kind, count, result.stderr))
+                self.assertIn(b'@PJL EOJ', result.stdout)
+            for count in range(1, len(header)):
+                with self.subTest(kind=kind, bytes=count):
+                    result = run_filter(raster + header[:count])
+                    self.assertEqual(result.returncode, 1, result.stderr)
+                    self.assertIn(b'Truncated raster header', result.stderr)
+                    self.assertNotIn(b'@PJL EOJ', result.stdout)
+
+    def test_file_input_reports_a_partial_header_instead_of_success(self):
+        raster = subprocess.check_output([str(ROOT/'build/raster_fixture'), '1', '3', 'tiny-compressed'])
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)/'job.ras'
+            for suffix, code in [(b'', 0), (raster[4:17], 1)]:
+                path.write_bytes(raster + suffix)
+                result = subprocess.run([os.environ.get('P1102_TEST_FILTER', str(ROOT/'build/rastertop1102')),
+                    '1', 'test', 'test', '1', '', str(path)], capture_output=True, timeout=5)
+                self.assertEqual(result.returncode, code, result.stderr)
+                self.assertEqual(b'@PJL EOJ' in result.stdout, code == 0)
+
+    def test_delayed_nonblocking_input_is_not_mistaken_for_a_failed_job(self):
+        import threading
+        import time
+        raster = subprocess.check_output([str(ROOT/'build/raster_fixture'), '1', '3', 'tiny-compressed'])
+        read_fd, write_fd = os.pipe()
+        os.set_blocking(read_fd, False)
+        errors = []
+        def write_job():
+            try:
+                time.sleep(0.1)
+                for offset in range(0, len(raster), 17):
+                    os.write(write_fd, raster[offset:offset + 17])
+                    time.sleep(0.001)
+            except OSError as error:
+                errors.append(error)
+            finally:
+                os.close(write_fd)
+        with subprocess.Popen([os.environ.get('P1102_TEST_FILTER', str(ROOT/'build/rastertop1102')),
+                '1', 'test', 'test', '1', ''], stdin=read_fd,
+                stdout=subprocess.PIPE, stderr=subprocess.PIPE) as process:
+            os.close(read_fd)
+            writer = threading.Thread(target=write_job, daemon=True)
+            writer.start()
+            try:
+                output, error = process.communicate(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.communicate()
+                self.fail('Filter did not finish after the complete delayed job.')
+            finally:
+                writer.join(timeout=5)
+            self.assertEqual(process.returncode, 0, error)
+            self.assertFalse(writer.is_alive())
+            self.assertEqual(errors, [])
+            self.assertIn(b'@PJL EOJ', output)
+
     def test_empty_job_is_an_error_instead_of_a_blank_success(self):
         self.assertNotEqual(run_filter(b'').returncode, 0)
+
+    def test_maximum_page_and_extreme_shifts_keep_every_edge_mark_in_bounds(self):
+        raster = subprocess.check_output([str(ROOT/'build/raster_fixture'), '1', '3', 'maximum'])
+        for options, left, top in [('P1102ShiftX=-15 P1102ShiftY=-31', 0, 0),
+                                   ('P1102ShiftX=68 P1102ShiftY=0', 83, 31)]:
+            with self.subTest(options=options), tempfile.TemporaryDirectory() as directory:
+                result = run_filter(raster, options)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                path = Path(directory)/'job.zjs'
+                path.write_bytes(result.stdout)
+                subprocess.run([str(ROOT/'build/zjsdecode'), '-d', str(Path(directory)/'page'), str(path)],
+                    check=True, stdout=subprocess.DEVNULL)
+                width, height, pixels = read_image(next(Path(directory).glob('page-*.pgm')))
+                self.assertEqual((width, height), (5184, 8436))
+                for y in [top, top + 8399]:
+                    for x in [left, left + 5099]:
+                        self.assertEqual(pixels[y * width + x], 0)
+                self.assertEqual(pixels[height * width - 1], 3)
 
     def test_untrusted_header_values_are_rejected_without_a_crash(self):
         import struct
@@ -243,6 +329,7 @@ class DriverTests(unittest.TestCase):
                 struct.pack_into('=I', damaged, 4 + 256 + field * 4, value)
                 result = run_filter(damaged)
                 self.assertEqual(result.returncode, 1, (field, value, result.stderr))
+                self.assertIn(b'ERROR: P1102:', result.stderr)
 
 
 if __name__ == '__main__':
