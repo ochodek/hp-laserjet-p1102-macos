@@ -15,6 +15,7 @@ expected = {
     'Library/Printers/P1102Native/commandtop1102': root/'build/commandtop1102',
     'Library/Printers/P1102Native/p1102ctl': root/'build/p1102ctl',
     'Library/Printers/P1102Native/LICENSE': root/'LICENSE',
+    'Library/Printers/P1102Native/NOTICE': root/'NOTICE',
     'Library/Printers/P1102Native/Source.tar.gz': root/'build/Source.tar.gz',
     'Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd': root/'ppd/HP-P1102-Native.ppd',
 }
@@ -36,6 +37,8 @@ with tempfile.TemporaryDirectory() as tmp:
             subprocess.run(['codesign','--verify','--strict',str(p)],check=True)
     info=ET.parse(component/'PackageInfo').getroot()
     assert info.attrib['relocatable']=='false' and info.attrib['install-location']=='/'
+    distribution=ET.parse(expanded/'Distribution').getroot()
+    assert distribution.find("pkg-ref[@version]").attrib['version']==info.attrib['version']=='1.7'
     assert len(info.find('relocate'))==0
     assert (component/'Scripts/postinstall').read_bytes()==(root/'scripts/postinstall').read_bytes()
     with tarfile.open(payload/'Library/Printers/P1102Native/Source.tar.gz') as archive:
@@ -45,5 +48,7 @@ with tempfile.TemporaryDirectory() as tmp:
             assert path.parts[0] not in ['build','dist','diagnostics','.git']
             if item.isfile():
                 assert (root/path).is_file() and archive.extractfile(item).read()==(root/path).read_bytes(), str(path)
-        assert {'src/usb.c','src/device.m','src/utility.m','src/pdf-tools.m','REVIEW.md','FEATURES.md','FEATURES.cs.md'} <= set(archive.getnames())
+        public_files={str(p.relative_to(root)) for folder in ['src','tests','vendor','ppd','installer','scripts'] for p in (root/folder).rglob('*') if p.is_file()}
+        public_files.update(p.name for p in root.iterdir() if p.is_file() and (p.suffix in ['.md','.sh'] or p.name in ['LICENSE','NOTICE','.gitignore','.gitattributes']))
+        assert public_files <= set(archive.getnames()), public_files-set(archive.getnames())
 print('Package contracts passed: exact payload/source, ARM64, signatures, safe modes and fixed destination.')

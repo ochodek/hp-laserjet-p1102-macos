@@ -17,8 +17,8 @@ Verze 1.7 je ve fázi ověřování. Jde o porovnání funkcí, nikoli certifika
 | Podání | Automatické nebo ruční |
 | Kopie, řazení, rozsahy stran, měřítko, orientace, obrácené pořadí, více stran na list a předvolby | Systémový tiskový dialog macOS; konkrétní nabídka závisí také na aplikaci |
 | Obálka dokumentu na jiném papíru | Samostatný tisk rozsahu stran obálky a těla s jiným typem papíru. Automatický průvodce vkládáním obálek zatím není. |
-| Ruční oboustranný tisk | Nástroj pro PDF v P1102 Utility; samostatný líc/rub, dlouhá/krátká vazba a doplnění prázdného rubu. Nejde o automatický duplex ani přímou volbu v dialogu všech aplikací. Orientaci vkládaného stohu ještě zbývá fyzicky ověřit. |
-| Brožury | PDF na šířku A4, vazba vlevo/vpravo, doplnění na násobek čtyř stran, náhled |
+| Ruční oboustranný tisk | Nástroj pro PDF v P1102 Utility; samostatný líc/rub, dlouhá/krátká vazba a doplnění prázdného rubu. Nejde o automatický duplex ani přímou volbu v dialogu všech aplikací. Čtyřstránkový test na zde připojené tiskárně potvrdil páry 1/2 a 3/4 i orientaci při otáčení jako kniha. Stoh se přenáší z výstupu do vstupu bez otočení. |
+| Brožury | PDF na šířku A4, vazba vlevo/vpravo, doplnění na násobek čtyř stran, náhled. Čtyřstránková brožura s vazbou vlevo a vodoznakem fyzicky potvrzena na jedné P1102. |
 | Vodoznak | Vlastní text na všech výstupních stranách nebo jen první; náhled a export PDF |
 | Jemný posun | Výchozí geometrie z 1.6 zůstává zachována. Pokročilé volby CUPS `P1102ShiftX` (-15…68) a `P1102ShiftY` (-31…0) posouvají obraz v existujícím bílém okraji po bodech 600 dpi. Neopravují mechanické kolísání podání. |
 
@@ -34,7 +34,7 @@ Otevři **Aplikace, P1102 Utility**, případně tlačítko nástroje tiskárny,
 * Příkazy pro konfigurační stránku, stav spotřebního materiálu, ukázku a čištění. Spouštějí se výslovným tlačítkem. Čištění vyžaduje vhodný kancelářský papír a trvá několik minut. Tyto akce ještě potřebují fyzické ověření.
 * Export diagnostiky do JSON z pevně vybraných polí, bez sériových čísel, uživatelských jmen, cest a obsahu dokumentů.
 * Nativní příkazový nástroj `/Library/Printers/P1102Native/p1102ctl`: `status`, `supplies`, `set`, `page`. Výpis CLI obsahuje sériové číslo tiskárny, před sdílením ho odstraň. Při více připojených P1102 lze CLI zadat konkrétní sériové číslo USB; grafická aplikace nejednoznačný výběr odmítne.
-* Příkaz CUPS `ReportLevels` pro údaje o náplni v macOS. CUPS může držet starší hodnotu; čas v obslužné aplikaci ukazuje čerstvé čtení z USB. Instalovaná fronta na macOS 27.0.1 úspěšně spustila ReportLevels a zveřejnila čerstvou hodnotu.
+* Příkaz CUPS `ReportLevels` pro údaje o náplni v macOS. CUPS může držet starší hodnotu; čas v obslužné aplikaci ukazuje čerstvé čtení z USB. Instalovaná fronta na macOS 27.0.1 úspěšně spustila ReportLevels a zveřejnila čerstvou hodnotu. Ukazatel byl ověřen i přímo v Nastavení systému, Volby a spotřební materiál, Úrovně náplní.
 
 ## Co tento kus tiskárny skutečně poskytl
 

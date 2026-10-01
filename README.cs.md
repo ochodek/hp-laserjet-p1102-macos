@@ -1,4 +1,4 @@
-# Ovladač HP LaserJet P1102 pro macOS a Apple Silicon
+# P1102 Native: ovladač pro HP LaserJet P1102 na macOS
 
 [English](README.md) | **Česky**
 
@@ -78,7 +78,7 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` v této větvi sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Jedenáct rastrových/protokolových testů a sady pro USB/XML a PDF ověřují dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
+`./build.sh` v této větvi sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Dvanáct rastrových/protokolových testů a sady pro USB/XML a PDF ověřují dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
 
 macOS vykreslí dokument do rastru; `src/rastertop1102.c` ověří jeho parametry a převede odstíny na čtyři úrovně tiskového bodu. Nezměněný kód **foo2zjs/JBIG-KIT** vytvoří ZjStream a systémový USB backend jej odešle do tiskárny. Instalovaný filtr se váže pouze na systémové `libcups` a `libSystem`. Viz [metoda měření odstínů](tests/TONE_REFERENCE.md) a [původ závislostí](vendor/UPSTREAM.txt).
 
@@ -97,3 +97,5 @@ Skript odstraní pouze nativní frontu a její soubory. Pokud byla výchozí, n�
 [GPL-2.0-or-later](LICENSE). Projekt používá práci Ricka Richardsona, Roberta Szalaie, Markuse Kuhna a dalších přispěvatelů foo2zjs a JBIG-KIT. Původní licenční upozornění a konkrétní revize zdrojů jsou zachované ve složce `vendor/`.
 
 Jde o komunitní projekt, nikoli produkt HP nebo Apple. Neobsahuje proprietární program ovladače HP ani firmware tiskárny. Viz [přehled vydání](CHANGELOG.md).
+
+Autory a distribuční oznámení uvádí [NOTICE](NOTICE). Kompletní odpovídající zdroje jsou součástí instalátoru i samostatně u vydání. Software je poskytován bez záruky v rozsahu přípustném právem; příjemcům zůstávají práva podle GPL.

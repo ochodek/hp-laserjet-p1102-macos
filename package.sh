@@ -8,11 +8,11 @@ mkdir -p "$root/Library/Printers/P1102Native" \
 install -m 755 build/rastertop1102 build/commandtop1102 build/p1102ctl "$root/Library/Printers/P1102Native/"
 mkdir -p "$root/Applications"
 ditto --noextattr --noqtn "build/P1102 Utility.app" "$root/Applications/P1102 Utility.app"
-install -m 644 LICENSE "$root/Library/Printers/P1102Native/"
+install -m 644 LICENSE NOTICE "$root/Library/Printers/P1102Native/"
 COPYFILE_DISABLE=1 tar --no-xattrs --uid 0 --gid 0 --uname root --gname wheel \
     -czf build/Source.tar.gz \
     src tests vendor ppd installer scripts build.sh test.sh package.sh uninstall.sh \
-    README.md README.cs.md SECURITY.md SECURITY.cs.md CHANGELOG.md FEATURES.md FEATURES.cs.md REVIEW.md LICENSE \
+    README.md README.cs.md SECURITY.md SECURITY.cs.md CHANGELOG.md FEATURES.md FEATURES.cs.md REVIEW.md NOTICE LICENSE \
     .gitignore .gitattributes
 install -m 644 build/Source.tar.gz "$root/Library/Printers/P1102Native/Source.tar.gz"
 install -m 644 ppd/HP-P1102-Native.ppd "$root/Library/Printers/PPDs/Contents/Resources/"

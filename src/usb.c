@@ -101,7 +101,10 @@ static p1102_usb *open_interface(const char *serial, int printing, char *error, 
 int p1102_usb_write(p1102_usb *usb, const void *bytes, size_t length)
 {
     if (!usb || length > 8192) return -1;
-    return (*usb->interface)->WritePipeTO(usb->interface, usb->output, (void *)bytes, (UInt32)length, 1500, 2000) ? -1 : 0;
+    IOReturn result = (*usb->interface)->WritePipeTO(usb->interface, usb->output, (void *)bytes, (UInt32)length, 1500, 2000);
+    if (result == kIOReturnBusy || result == kIOReturnNotOpen || result == kIOReturnAborted ||
+        result == kIOReturnTimeout || result == kIOReturnNotResponding) return P1102_USB_TRANSIENT;
+    return result ? -1 : 0;
 }
 
 int p1102_usb_read(p1102_usb *usb, void *bytes, size_t capacity, size_t *length)
