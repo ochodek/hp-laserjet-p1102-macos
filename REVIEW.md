@@ -92,3 +92,38 @@ The new installer has English/Czech introductory, requirements and completion pa
 * Second Mac and older macOS releases remain untested; macOS 28 compatibility cannot be promised.
 
 Development captures can contain hardware identifiers and remain excluded by `.gitignore`. This review does not publish them or the user's photographed documents.
+
+## 1.7.2: localized queue checks
+
+The existing 1.7.1 installation falsely rejected its own P1102 queue because
+`lpstat` emitted Czech text even with `LC_ALL=C LANG=C`. The same English-prefix
+comparison affected removal. Version 1.7.2 replaces both comparisons with a
+shared, read-only native IPP guard, included in the package Scripts archive as
+well as its installed payload. Its queries and administrative commands target
+the same standard local CUPS socket. Errors cannot masquerade as queue absence;
+classes, foreign identities and incomplete jobs block changes.
+
+The review covered the IPP parser and transport, root hook ordering, update
+preservation, discovery races, uninstaller file inventory, older-installation
+preflight and package/source completeness. It also found FinderInfo attached
+to app bundles built in iCloud Documents. Private temporary build/package
+staging and metadata-free copies fixed the reproduced signature failure.
+
+The complete package suite, 39 native queue/job checks, six production-client
+transport methods, twelve installer methods and seven removal methods passed.
+The queue parser and existing raster/device/PDF contracts passed ASan/UBSan;
+the new production C source passed static analysis. A read-only integration
+check used the packaged guard against the actual idle queue and executed the
+packaged hooks with every mutation mocked; installed PPD/filter hashes and
+default-printer output were unchanged. Package expansion verified exact bytes,
+ARM64 signatures, file modes, Scripts contents and corresponding sources.
+
+Additional review reproduced a malformed Get-Jobs response whose job data was
+in the wrong IPP group. It previously looked like an idle queue; the parser now
+rejects it, with native and real-libcups transport regressions.
+
+The same coding agent performed implementation and review. Actual 1.7.2
+installation, physical printing and destructive removal were not performed
+during this review. Concurrent administration/jobs can race the final snapshot;
+no atomicity or cross-macOS validation is claimed. See
+[the full cause, decisions and verification](docs/queue-validation.md).

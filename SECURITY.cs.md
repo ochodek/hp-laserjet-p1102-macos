@@ -1,4 +1,4 @@
-# Bezpečnost, verze 1.7
+# Bezpečnost, verze 1.7.2
 
 [English](SECURITY.md) | **Česky**
 
@@ -8,11 +8,13 @@ Jde o vibe-coded projekt vyvíjený s pomocí AI. Interní kontrola kódu a bezp
 
 Nativní rastrový filtr kontroluje černobílý vstup CUPS a používá připnutou verzi kodéru foo2zjs/JBIG. Odkazuje na systémové libcups a libSystem. Nový příkazový filtr a CLI používají Foundation a IOKit, obslužná aplikace navíc Cocoa, PDFKit a PrintCore. Všechny dodávané programy jsou ARM64.
 
-Běhový kód neobsahuje síťového klienta, telemetrii, aktualizátor, spouštění shellu, stahování, přístup k heslům či klíčence, trvalou službu, rozšíření jádra, změnu firmwaru ani tovární reset. Zprávy HTTP jsou přenášeny po USB. Aplikace otevírá dvě rozhraní konkrétního modelu běžným způsobem, bez vynuceného převzetí nebo resetu. Příkazy a hodnoty nastavení pocházejí z pevných seznamů. Uživatelská jména ani názvy dokumentů se nevkládají do příkazů tiskárně.
+Běhový kód neobsahuje internetového klienta, telemetrii, aktualizátor, spouštění shellu, stahování, přístup k heslům či klíčence, trvalou službu, rozšíření jádra, změnu firmwaru ani tovární reset. Nová kontrola fronty ve verzi 1.7.2 používá HTTP/IPP pouze přes pevný místní socket CUPS; požadavek na heslo vede k zastavení. Zprávy pro správu tiskárny jsou přenášeny po USB. Aplikace otevírá dvě rozhraní konkrétního modelu běžným způsobem, bez vynuceného převzetí nebo resetu. Příkazy a hodnoty nastavení pocházejí z pevných seznamů. Uživatelská jména ani názvy dokumentů se nevkládají do příkazů tiskárně.
 
 Instalátor potřebuje správce kvůli souborům ovladače, aplikaci a vlastní frontě CUPS. Programy mají práva 0755, bez setuid. Původní fronta HP i výchozí tiskárna zůstávají zachované. Aplikace běží pod přihlášeným uživatelem a při běžném použití správce nepotřebuje. Tiskové soubory spravuje macOS. Odinstalační skript odstraňuje pouze známé soubory a kontroluje identitu balíčku aplikace.
 
-Balík obsahuje rastrový filtr, `commandtop1102`, `p1102ctl`, licenci a úplný zdrojový archiv v `/Library/Printers/P1102Native`, PPD v `/Library/Printers/PPDs/Contents/Resources` a `/Applications/P1102 Utility.app`. Nepřidává trvale spouštěnou službu. Oprávnění pro automatizaci rozhraní použité při vývoji není požadavkem ovladače.
+Balík obsahuje rastrový filtr, `commandtop1102`, `p1102ctl`, `p1102-queue-check`, licenci a úplný zdrojový archiv v `/Library/Printers/P1102Native`, PPD v `/Library/Printers/PPDs/Contents/Resources` a `/Applications/P1102 Utility.app`. Nepřidává trvale spouštěnou službu. Oprávnění pro automatizaci rozhraní použité při vývoji není požadavkem ovladače.
+
+Kontrola v 1.7.2 vyžaduje správnou identitu fronty a žádné nedokončené úlohy. Pouze výslovná odpověď IPP „nenalezeno“ dovolí považovat frontu za chybějící; chyba spojení, oprávnění nebo protokolu změny zastaví. Kontrola i správa používají stejný místní socket. Jiný správce nebo nová úloha mohou zasáhnout po poslední kontrole, která není atomickou transakcí. Příčinu, testy a meze ověření popisuje [ověření fronty](docs/queue-validation.md#česky).
 
 ## Vstupy a soukromí
 

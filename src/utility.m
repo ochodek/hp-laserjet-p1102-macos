@@ -48,7 +48,7 @@ static NSStackView *stack(NSArray<NSView *> *views)
 { NSAlert *a = [NSAlert new]; a.messageText = text; [a addButtonWithTitle:L(@"Continue", @"Pokračovat")]; [a addButtonWithTitle:L(@"Cancel", @"Zrušit")]; return [a runModal] == NSAlertFirstButtonReturn; }
 - (void)about:(id)sender
 {
-    (void)sender; NSAlert *a = [NSAlert new]; a.messageText = @"P1102 Utility 1.7.1";
+    (void)sender; NSAlert *a = [NSAlert new]; a.messageText = @"P1102 Utility 1.7.2";
     a.informativeText = L(@"Independent community software for HP LaserJet P1102 printers. Maintained by Marek Ochodek and contributors, 2026. Vibe-coded with AI assistance. Not affiliated with or endorsed by HP or Apple.\n\nGPL version 2 or later; you may modify and redistribute under that licence. No warranty, to the extent permitted by law. Includes foo2zjs by Rick Richardson, Robert Szalai and contributors, and JBIG-KIT by Markus Kuhn. Full notices are in the app's Resources/NOTICE.\n\nMatching source: /Library/Printers/P1102Native/Source.tar.gz",
         @"Nezávislý komunitní software pro tiskárny HP LaserJet P1102. Spravuje Marek Ochodek a přispěvatelé, 2026. Vibe-coded s pomocí AI. Bez propojení s HP či Apple a bez jejich schválení.\n\nGPL verze 2 nebo novější, dovoluje úpravy a další šíření podle této licence. Bez záruky v rozsahu dovoleném právem. Obsahuje foo2zjs autorů Ricka Richardsona, Roberta Szalaie a přispěvatelů a JBIG-KIT Markuse Kuhna. Úplná oznámení jsou v Resources/NOTICE aplikace.\n\nOdpovídající zdroje: /Library/Printers/P1102Native/Source.tar.gz");
     [a addButtonWithTitle:L(@"Close",@"Zavřít")]; [a addButtonWithTitle:L(@"View licence",@"Zobrazit licenci")];
@@ -63,7 +63,7 @@ static NSStackView *stack(NSArray<NSView *> *views)
 {
     (void)notification; _controls = [NSMutableArray array];
     _window = [[NSWindow alloc] initWithContentRect:NSMakeRect(0,0,790,730) styleMask:NSWindowStyleMaskTitled|NSWindowStyleMaskClosable|NSWindowStyleMaskMiniaturizable backing:NSBackingStoreBuffered defer:NO];
-    _window.title = @"P1102 Utility 1.7.1";
+    _window.title = @"P1102 Utility 1.7.2";
     NSTabView *tabs = [NSTabView new];
     _tonerLabel = label(L(@"Toner: not read yet", @"Toner: zatím nenačten")); _tonerLabel.font = [NSFont boldSystemFontOfSize:24];
     _toner = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(0,0,600,18)]; _toner.indeterminate = NO; _toner.minValue = 0; _toner.maxValue = 100;
@@ -128,7 +128,7 @@ static NSStackView *stack(NSArray<NSView *> *views)
 {
     (void)sender; if (!_snapshot) { [self alert:L(@"Refresh printer data first.",@"Nejdřív načti údaje tiskárny.")]; return; }
     NSArray *keys = @[@"tonerPercent",@"tonerState",@"cartridge",@"totalPages",@"cartridgePages",@"estimatedPagesRemaining",@"jams",@"mispicks",@"eventCodes",@"states",@"alerts",@"firmwareDate",@"trayMedia",@"traySize",@"sleep",@"autoOff",@"readAt"];
-    NSMutableDictionary *safe = [NSMutableDictionary dictionaryWithObject:@"1.7.1" forKey:@"driverVersion"];
+    NSMutableDictionary *safe = [NSMutableDictionary dictionaryWithObject:@"1.7.2" forKey:@"driverVersion"];
     for (NSString *key in keys) if (_snapshot[key]) safe[key] = _snapshot[key];
     NSSavePanel *panel = [NSSavePanel savePanel]; panel.nameFieldStringValue = @"P1102-diagnostics.json";
     if ([panel runModal] == NSModalResponseOK) { NSError *error = nil; NSData *data = [NSJSONSerialization dataWithJSONObject:safe options:NSJSONWritingPrettyPrinted error:&error]; if (!data || ![data writeToURL:panel.URL options:NSDataWritingAtomic error:&error]) [self alert:error.localizedDescription]; }

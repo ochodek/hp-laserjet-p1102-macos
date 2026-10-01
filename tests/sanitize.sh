@@ -2,6 +2,10 @@
 set -eu
 cd "$(dirname "$0")/.."
 mkdir -p build/sanitized
+xcrun clang -arch arm64 -O1 -g -std=c11 -Wall -Wextra -Werror \
+    -DP1102_QUEUE_CHECK_TESTS -fsanitize=address,undefined -fno-omit-frame-pointer \
+    src/queue-check.c tests/queue_tests.c -lcups -o build/sanitized/queue-tests
+UBSAN_OPTIONS=halt_on_error=1 ASAN_OPTIONS=detect_leaks=0 build/sanitized/queue-tests
 for source in foo2zjs jbig jbig_ar; do
     xcrun clang -arch arm64 -O1 -g -std=gnu99 -fsanitize=address,undefined \
         -fno-omit-frame-pointer -Dmain=foo2zjs_cli_main -Ivendor/foo2zjs \

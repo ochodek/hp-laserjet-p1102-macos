@@ -1,5 +1,13 @@
 # Changelog / Přehled vydání
 
+## 1.7.2, 2026-10-01
+
+Fix localized-macOS upgrade and removal checks by reading typed IPP attributes from the local CUPS socket instead of matching English lpstat output. Share the native guard between packaged preflight/postinstall and the installed uninstaller. Explicitly reject unrelated queues/classes, pending jobs, missing metadata and scheduler/authentication/protocol errors; preserve existing queue settings and the default printer. Pin CUPS administration/discovery to the same local socket. Add parser, real-libcups transport, hook and package regressions. Reject job attributes in the wrong IPP group instead of treating the queue as idle. Raster/protocol code is unchanged. Details and validation limits: [queue validation](docs/queue-validation.md).
+
+Assemble/sign the app and stage packages in private temporary directories, and exclude HFS metadata/resource forks when copying build products. This prevents FinderInfo added by file providers from invalidating the packaged app's signature.
+
+Oprava českého a dalšího lokalizovaného macOS nahrazuje porovnávání přeloženého výpisu strukturovanými daty CUPS. Aktualizace i odinstalace zachovávají kontrolu vlastnictví fronty a zastaví změny při čekajících úlohách nebo neověřitelné službě. Balíček obsahuje stejný nativní kontrolní nástroj pro instalaci i odstranění; doplněné testy ověřují lokalizaci, chyby a bezpečné zastavení. Chybně zařazené údaje o úlohách také zastaví změny.
+
 ## 1.7.1, 2026-10-01
 
 Reject partial trailing raster headers instead of silently completing damaged jobs, retain delayed nonblocking input through poll, bind USB XML to the requested resource and enforce UTF-8/NUL restrictions. Fix privileged-hook executable lookup and use a manifest-based source archive rebuildable without Git. Add maximum-page/extreme-shift regressions, an original application icon. Installed drivers are not changed automatically.

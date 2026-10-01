@@ -1,4 +1,4 @@
-# Security, 1.7
+# Security, 1.7.2
 
 **English** | [Česky](SECURITY.cs.md)
 
@@ -6,13 +6,15 @@ This vibe-coded project was developed with AI assistance. An internal code and s
 
 ## Runtime and permissions
 
-The native raster filter validates monochrome CUPS input and uses the pinned foo2zjs/JBIG encoder. It links to system libcups and libSystem. The new command filter and CLI use Foundation and IOKit; P1102 Utility additionally uses Cocoa, PDFKit and PrintCore. All release executables are ARM64.
+The native raster filter validates monochrome CUPS input and uses the pinned foo2zjs/JBIG encoder. It links to system libcups and libSystem. The command filter and CLI use Foundation and IOKit; P1102 Utility additionally uses Cocoa, PDFKit and PrintCore. Version 1.7.2 adds a read-only libcups queue guard for installation/removal. All release executables are ARM64.
 
-Runtime code has no network client, telemetry, updater, shell execution, download logic, credential/keychain access, persistent background agent, kernel extension, firmware modification or factory reset. HTTP-framed management messages travel over USB. The application talks to two model-specific USB interfaces without seizing or resetting them. Commands and settings are allowlisted; users' names and document titles are not put in printer commands.
+Runtime code has no internet client, telemetry, updater, shell execution, download logic, credential/keychain access, persistent background agent, kernel extension, firmware modification or factory reset. The queue guard uses HTTP/IPP only through the fixed local macOS CUPS domain socket; authentication challenges fail instead of prompting for a password. HTTP-framed device management messages travel over USB. The application talks to two model-specific USB interfaces without seizing or resetting them. Commands and settings are allowlisted; users' names and document titles are not put in printer commands.
 
 The installer requires administrator permission for root-owned driver files, the application and its own CUPS queue. Executables use mode 0755 with no setuid bit. It preserves the original HP queue and default printer choice. The application runs as the logged-in user and needs no administrator permission for normal use. macOS handles document spooling. Installation rejects conflicting queues, unrelated utility bundles and symbolic links in owned destinations. The supplied uninstaller removes only named files, checks queue/application identity and refuses pending native jobs. Removal contract tests use mocks; the working installation was not destructively removed during validation.
 
-The payload contains the raster filter, `commandtop1102`, `p1102ctl`, license and complete source archive under `/Library/Printers/P1102Native`, the PPD under `/Library/Printers/PPDs/Contents/Resources`, and `/Applications/P1102 Utility.app`. No launch agent/daemon is installed. UI automation permission used during development is not a driver requirement.
+The payload contains the raster filter, `commandtop1102`, `p1102ctl`, `p1102-queue-check`, license and complete source archive under `/Library/Printers/P1102Native`, the PPD under `/Library/Printers/PPDs/Contents/Resources`, and `/Applications/P1102 Utility.app`. No launch agent/daemon is installed. UI automation permission used during development is not a driver requirement.
+
+The 1.7.2 guard requires typed queue identity and no incomplete jobs before updating or deleting a queue. Only explicit IPP not-found means absence; connection, authentication and protocol failures stop changes. Queries and administration are pinned to the same local socket. Checks are snapshots, so concurrent queue changes or new jobs can still race the final check. Cause, tests and coverage limits are recorded in [queue validation](docs/queue-validation.md).
 
 ## Input handling and privacy
 
