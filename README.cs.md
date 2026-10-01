@@ -78,7 +78,7 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` v této větvi sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Deset rastrových/protokolových testů a sady pro USB/XML a PDF ověřují dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
+`./build.sh` v této větvi sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Jedenáct rastrových/protokolových testů a sady pro USB/XML a PDF ověřují dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
 
 macOS vykreslí dokument do rastru; `src/rastertop1102.c` ověří jeho parametry a převede odstíny na čtyři úrovně tiskového bodu. Nezměněný kód **foo2zjs/JBIG-KIT** vytvoří ZjStream a systémový USB backend jej odešle do tiskárny. Instalovaný filtr se váže pouze na systémové `libcups` a `libSystem`. Viz [metoda měření odstínů](tests/TONE_REFERENCE.md) a [původ závislostí](vendor/UPSTREAM.txt).
 

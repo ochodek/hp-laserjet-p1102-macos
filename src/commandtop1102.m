@@ -25,7 +25,7 @@ int main(int argc, const char **argv)
         if (invalid || !report) { fprintf(stderr, "ERROR: P1102: Unsupported command.\n"); return 1; }
         NSError *error = nil; NSDictionary *supply = P1102Supplies(serial, &error);
         if (!supply) {
-            fprintf(stderr, "ATTR: marker-levels=-2\nWARNING: P1102: Cannot refresh supplies; level is unknown.\n"); return 1;
+            fprintf(stderr, "ATTR: marker-levels=-2\nWARNING: P1102: Cannot refresh supplies; level is unknown.\n"); return 0;
         }
         NSNumber *level = supply[@"tonerPercent"];
         fprintf(stderr, "ATTR: marker-colors=#000000 marker-names=Black marker-types=toner marker-levels=%ld\n", level ? level.longValue : -2L);

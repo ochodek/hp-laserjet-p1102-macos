@@ -28,6 +28,16 @@ def read_image(image):
 
 
 class DriverTests(unittest.TestCase):
+    def test_unavailable_supply_metadata_does_not_fail_a_print_queue(self):
+        uri = 'usb://Hewlett-Packard/HP%20LaserJet%20Professional%20P1102?serial=TEST-NONEXISTENT-DEVICE'
+        result = subprocess.run([str(ROOT/'build/commandtop1102'),'1','test','levels','1',''],
+            input=b'#CUPS-COMMAND\nReportLevels\n',capture_output=True,
+            env={**os.environ,'DEVICE_URI':uri},timeout=5)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(result.stdout,b'')
+        self.assertIn(b'marker-levels=-2',result.stderr)
+        self.assertIn(b'WARNING:',result.stderr)
+
     def test_job_options_reach_the_printer_without_changing_the_calibrated_default(self):
         raster = subprocess.check_output([str(ROOT / 'build/raster_fixture'), '8', '0'])
         for options, density, economy, recovery in [('',3,'OFF','OFF'),('pjlDensity=5 EconoMode=True pjlJamRecovery=True',5,'ON','AUTO')]:

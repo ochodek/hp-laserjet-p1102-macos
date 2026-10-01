@@ -12,6 +12,8 @@ The functional review followed data from print options through CUPS raster heade
 
 | Finding | Impact | Resolution and evidence |
 | --- | --- | --- |
+| Unavailable optional supply metadata could fail a CUPS command job | Misleading filter-failure indication despite working printing | Emit unknown (-2) and an explicit warning while completing the metadata command. CLI errors remain failures. A nonexistent-device contract test verifies this. |
+| Concurrent utility/CUPS refreshes competed for the management interface | A refresh could mark toner unknown despite a connected printer | Retry only busy/exclusive-open errors for at most 0.5 seconds; no forced claim. Three overlapping live status/supply pairs passed. |
 | USB reads can leave the requested byte count unchanged on error | Could copy uninitialized buffer bytes into a response | Ignore the count and buffer on every failed read. The public transport sets output length to zero before calling IOKit. |
 | HTTP fragments can end inside a header, chunk length, payload or terminator | Partial or misframed supply values | Strict bounded framing parser; every proper prefix of a representative chunked message remains incomplete, not successful. Conflicting and duplicate framing headers are rejected. |
 | Untrusted XML can declare entities or excessive nesting | File access or memory exhaustion | UTF-8 only, no DTD/entity declarations, external entities disabled, message/depth/node/text limits. Malicious entity fixtures and depth-limit tests pass. |
@@ -33,7 +35,7 @@ The command-filter analyzer also flagged a possible open stream leak because it 
 
 * Strict compiler warnings (`-Wall -Wextra -Werror`) for all first-party release sources.
 * Clang Static Analyzer: no reported findings in first-party sources after the fixes. This is a bounded tool result, not proof of safety.
-* Ten raster/protocol contract tests: full-image and 256-tone regressions, fractional geometry, copies, polarity, job settings, paper/media/quality codes, malformed and truncated input.
+* Eleven raster/protocol contract tests: full-image and 256-tone regressions, fractional geometry, copies, polarity, job settings, paper/media/quality codes, malformed and truncated input.
 * HTTP/XML/device contracts: fragmented messages, malformed framing, mutation corpus, size/depth/entity restrictions, unknown/duplicate levels, scoped counters, command allowlists and URI identity validation.
 * PDF contracts: booklet order and padding, front/back pairing, binding rotation, source preservation, first-page watermark, printed annotations, page rotation and limits.
 * These suites run under AddressSanitizer and UndefinedBehaviorSanitizer. Leak detection is disabled; system frameworks are not rebuilt or audited by these checks.

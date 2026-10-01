@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 struct p1102_usb { IOUSBInterfaceInterface182 **interface; UInt8 input, output; };
 
@@ -71,7 +72,15 @@ static p1102_usb *open_interface(const char *serial, int printing, char *error, 
         (*plugin)->QueryInterface(plugin, CFUUIDGetUUIDBytes(kIOUSBInterfaceInterfaceID182), (LPVOID *)&interface);
         IODestroyPlugInInterface(plugin);
         if (!interface) continue;
-        if ((*interface)->USBInterfaceOpen(interface)) { (*interface)->Release(interface); continue; }
+        /* The utility and CUPS can refresh at the same instant. Let a short
+           read-only exchange finish instead of reporting a false unknown level.
+           Never force ownership, and never retry permission/device errors. */
+        for (unsigned attempt = 0; attempt < 11; attempt++) {
+            result = (*interface)->USBInterfaceOpen(interface);
+            if ((result != kIOReturnExclusiveAccess && result != kIOReturnBusy) || attempt == 10) break;
+            struct timespec delay = {0, 50000000}; nanosleep(&delay, NULL);
+        }
+        if (result) { (*interface)->Release(interface); continue; }
         UInt8 endpoints = 0, input = 0, output = 0;
         if (!(*interface)->GetNumEndpoints(interface, &endpoints)) {
             for (unsigned i = 1; i <= endpoints; i++) {
