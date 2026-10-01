@@ -1,6 +1,7 @@
 """Protect active jobs, unrelated queues and files during explicit removal."""
 import json
 import os
+import plistlib
 from pathlib import Path
 import subprocess
 import tempfile
@@ -20,6 +21,8 @@ class UninstallTests(unittest.TestCase):
                 mock.chmod(0o755);script=script.replace(path,str(mock))
             target=folder/'driver';app=folder/'app'
             target.mkdir()
+            (app/'Contents/Resources').mkdir(parents=True)
+            (app/'Contents/Info.plist').write_bytes(plistlib.dumps({'CFBundleIdentifier':'cz.marek.p1102-native.utility'}))
             if redirect:(target/'LICENSE').symlink_to(folder/'unrelated')
             script=script.replace('/Library/Printers/P1102Native',str(target)).replace('/Applications/P1102 Utility.app',str(app))
             fixture=folder/'uninstall.sh';fixture.write_text(script)
@@ -44,6 +47,7 @@ class UninstallTests(unittest.TestCase):
         self.assertEqual(result.returncode,0,result.stderr)
         self.assertEqual([c for c in changes if c[0]=='lpadmin'],[['lpadmin','-x','HP_LaserJet_P1102_Native']])
         self.assertFalse(any('-r' in arg or '-R' in arg for c in changes if c[0]=='rm' for arg in c[1:]))
+        self.assertTrue(any(arg.endswith('/Contents/Resources/P1102Utility.icns') for c in changes if c[0]=='rm' for arg in c[1:]))
         self.assertEqual(changes[-1],['pkgutil','--forget','cz.marek.p1102-native'])
 
     def test_dismissing_the_launcher_does_not_request_privileges(self):

@@ -32,7 +32,7 @@ app="/Applications/P1102 Utility.app"
 if [ -f "$app/Contents/Info.plist" ] && [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Contents/Info.plist")" = cz.marek.p1102-native.utility ]; then
     /bin/rm -f "$app/Contents/MacOS/P1102Utility" "$app/Contents/Info.plist" "$app/Contents/_CodeSignature/CodeResources"
     if [ -d "$app/Contents/Resources" ]; then
-        /bin/rm -f "$app/Contents/Resources/LICENSE" "$app/Contents/Resources/NOTICE"
+        /bin/rm -f "$app/Contents/Resources/LICENSE" "$app/Contents/Resources/NOTICE" "$app/Contents/Resources/P1102Utility.icns"
         /bin/rmdir "$app/Contents/Resources"
     fi
     /bin/rmdir "$app/Contents/MacOS" "$app/Contents/_CodeSignature" "$app/Contents" "$app"

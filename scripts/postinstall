@@ -5,7 +5,7 @@ LC_ALL=C
 export LC_ALL
 queue=HP_LaserJet_P1102_Native
 ppd=/Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd
-. "$(dirname "$0")/check-queue"
+. "$(/usr/bin/dirname "$0")/check-queue"
 if /usr/bin/lpstat -v "$queue" >/dev/null 2>&1; then
     /usr/sbin/lpadmin -p "$queue" -P "$ppd"
     exit 0
@@ -18,5 +18,5 @@ if [ -n "$uri" ]; then
     /usr/sbin/lpadmin -p "$queue" -E -v "$uri" -P "$ppd" \
         -D 'HP LaserJet P1102 Native' -o printer-is-shared=false
 else
-    printf '%s\n' 'Driver installed. Automatic setup requires exactly one connected P1102. Add the intended printer in Printers & Scanners using HP LaserJet P1102 Native ARM64, 1.7.'
+    printf '%s\n' 'Driver installed. Automatic setup requires exactly one connected P1102. Add the intended printer in Printers & Scanners using HP LaserJet P1102 Native ARM64, 1.7.1.'
 fi

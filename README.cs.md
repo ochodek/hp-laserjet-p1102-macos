@@ -10,19 +10,21 @@ Projekt vznikl po aktualizaci macOS, kdy původní tisková fronta HP hlásila *
 
 **[Stáhnout instalátor](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest)** | [Instalace](#instalace) | [Kompatibilita](#kompatibilita-a-ověření) | [Nahlásit problém](https://github.com/ochodek/hp-laserjet-p1102-macos/issues)
 
-## Verze 1.7
+## Verze 1.7.1
+
+Verze 1.7.1 zpřesňuje zpracování neúplného rastru, odpovědí USB/XML a balení zdrojů a přidává ikonu aplikace. Fyzické zkoušky níže popisují verzi 1.7; verze 1.7.1 prošla automatickým ověřením.
 
 Nativní nástroj pro toner a stav tiskárny, volby papíru a kvality, tichý režim, časovače a PDF nástroje pro brožury, vodoznaky a ruční duplex. [Přehled funkcí](FEATURES.cs.md) a [zpráva z kontroly kódu](REVIEW.md) uvádějí ověřené chování i jeho meze. Instalátor obsahuje české a anglické pokyny, licenci GPL, kontroly aktualizace a odinstalaci.
 
 ## Instalace
 
-1. V části [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) stáhněte `HP-P1102-Native-1.7.pkg`. Nic nemusíte kompilovat.
+1. V části [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) stáhněte `HP-P1102-Native-1.7.1.pkg`. Nic nemusíte kompilovat.
 2. Připojte zapnutou P1102 přes USB, případně funkční USB adaptér. Vložte papír A4.
 3. Otevřete balíček a dokončete instalaci. macOS vyžádá oprávnění správce.
 4. V tiskovém dialogu vyberte **HP LaserJet P1102 Native**. Pokud chcete, nastavte ji jako výchozí v **Nastavení systému, Tiskárny a skenery**.
 5. Ověřte výsledek tiskem jedné stránky.
 
-Před aktualizací ukončete P1102 Utility a dokončete čekající úlohy. Instalátor vytvoří vlastní frontu, pokud najde právě jednu připojenou P1102. Jestliže byla při instalaci odpojená, přidejte ji v **Tiskárnách a skenerech**, v nabídce **Použít: Vybrat software** zvolte **HP LaserJet P1102 Native ARM64, 1.7**. Případně znovu spusťte instalátor s připojenou tiskárnou. Aktualizace obnoví PPD tohoto ovladače a zachová zvolené nastavení kvality. Pokud název fronty patří jiné tiskárně, instalace se zastaví. Při více připojených P1102 vyberte zamýšlenou tiskárnu ručně. Původní fronta HP i volba výchozí tiskárny zůstávají zachované.
+Před aktualizací ukončete P1102 Utility a dokončete čekající úlohy. Instalátor vytvoří vlastní frontu, pokud najde právě jednu připojenou P1102. Jestliže byla při instalaci odpojená, přidejte ji v **Tiskárnách a skenerech**, v nabídce **Použít: Vybrat software** zvolte **HP LaserJet P1102 Native ARM64, 1.7.1**. Případně znovu spusťte instalátor s připojenou tiskárnou. Aktualizace obnoví PPD tohoto ovladače a zachová zvolené nastavení kvality. Pokud název fronty patří jiné tiskárně, instalace se zastaví. Při více připojených P1102 vyberte zamýšlenou tiskárnu ručně. Původní fronta HP i volba výchozí tiskárny zůstávají zachované.
 
 ### Bezpečnostní upozornění macOS
 
@@ -78,7 +80,7 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Třináct rastrových/protokolových testů a sady pro USB/XML, PDF, instalaci a odinstalaci ověřují dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
+`./build.sh` sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty v `dist/`. Rastrové/protokolové testy a sady USB/XML, PDF a instalace/odinstalace ověřují obraz, kopie, odstíny, geometrii a neplatné vstupy. Archiv lze stejně sestavit bez `.git`; inventář určuje `SOURCE_MANIFEST`. Kontroly paměti a analýzu popisuje [SECURITY.cs.md](SECURITY.cs.md).
 
 macOS vykreslí dokument do rastru; `src/rastertop1102.c` ověří jeho parametry a převede odstíny na čtyři úrovně tiskového bodu. Nezměněný kód **foo2zjs/JBIG-KIT** vytvoří ZjStream a systémový USB backend jej odešle do tiskárny. Instalovaný filtr se váže pouze na systémové `libcups` a `libSystem`. Viz [metoda měření odstínů](tests/TONE_REFERENCE.md) a [původ závislostí](vendor/UPSTREAM.txt).
 

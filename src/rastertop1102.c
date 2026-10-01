@@ -3,8 +3,10 @@
 #include <cups/raster.h>
 #include <cups/cups.h>
 #include "job.h"
+#include <errno.h>
 #include <fcntl.h>
 #include <math.h>
+#include <poll.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +25,33 @@ static void fail(const char *message)
 {
     fprintf(stderr, "ERROR: P1102: %s\n", message);
     exit(1);
+}
+
+struct raster_input {
+    int fd, reading_header, read_error;
+    size_t header_size, header_bytes, last_request;
+};
+static ssize_t read_raster(void *context, unsigned char *buffer, size_t length)
+{
+    struct raster_input *input = context;
+    if (input->reading_header) {
+        if (!input->header_size) input->header_size = length;
+        input->last_request = length;
+    }
+    ssize_t count;
+    for (;;) {
+        count = read(input->fd, buffer, length);
+        if (count >= 0 || (errno != EINTR && errno != EAGAIN && errno != EWOULDBLOCK)) break;
+        if (errno != EINTR) {
+            struct pollfd pending = {.fd = input->fd, .events = POLLIN};
+            int ready;
+            do { ready = poll(&pending, 1, -1); } while (ready < 0 && errno == EINTR);
+            if (ready < 0) break;
+        }
+    }
+    if (count < 0) input->read_error = 1;
+    if (count > 0 && input->reading_header) input->header_bytes += (size_t)count;
+    return count;
 }
 
 static int paper_code(const unsigned *size)
@@ -72,7 +101,8 @@ int main(int argc, char **argv)
     int shift_y = integer_option(options, option_count, "P1102ShiftY", 0, -31, 0);
     int fd = argc == 7 ? open(argv[6], O_RDONLY) : STDIN_FILENO;
     if (fd < 0) fail("Cannot open raster input.");
-    cups_raster_t *raster = cupsRasterOpen(fd, CUPS_RASTER_READ);
+    struct raster_input input = {.fd = fd};
+    cups_raster_t *raster = cupsRasterOpenIO(read_raster, &input, CUPS_RASTER_READ);
     if (!raster) fail("Cannot read CUPS raster input.");
 
     Model = 2;                 /* HP Pro P1102 dialect */
@@ -85,7 +115,19 @@ int main(int argc, char **argv)
     JbgOptions[3] = 0;          /* This printer requires JBIG MX = 0. */
     cups_page_header2_t h;
 
-    while (cupsRasterReadHeader2(raster, &h)) {
+    for (;;) {
+        input.reading_header = 1;
+        input.header_bytes = input.last_request = 0;
+        unsigned have_header = cupsRasterReadHeader2(raster, &h);
+        input.reading_header = 0;
+        if (!have_header) {
+            /* Buffered compression can consume part of a header before the
+               callback sees EOF. Clean EOF requests an entire new header. */
+            if (input.read_error) fail("Cannot read raster input.");
+            if (input.header_bytes || input.last_request != input.header_size)
+                fail("Truncated raster header; job was not completed.");
+            break;
+        }
         if (h.HWResolution[0] != 600 || h.HWResolution[1] != 600 ||
             h.cupsColorOrder != CUPS_ORDER_CHUNKED ||
             (h.cupsColorSpace != CUPS_CSPACE_K && h.cupsColorSpace != CUPS_CSPACE_W) ||

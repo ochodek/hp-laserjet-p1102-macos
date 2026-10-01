@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 
 root = Path(__file__).resolve().parents[1]
 package = Path(sys.argv[1]).resolve()
+source_files = set((root/'SOURCE_MANIFEST').read_text().splitlines())
 expected = {
     'Library/Printers/P1102Native/rastertop1102': root/'build/rastertop1102',
     'Library/Printers/P1102Native/commandtop1102': root/'build/commandtop1102',
@@ -22,7 +23,7 @@ expected = {
     'Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd': root/'ppd/HP-P1102-Native.ppd',
 }
 app = root/'build/P1102 Utility.app'
-for name in ['Contents/Info.plist','Contents/MacOS/P1102Utility','Contents/_CodeSignature/CodeResources','Contents/Resources/LICENSE','Contents/Resources/NOTICE']:
+for name in ['Contents/Info.plist','Contents/MacOS/P1102Utility','Contents/_CodeSignature/CodeResources','Contents/Resources/LICENSE','Contents/Resources/NOTICE','Contents/Resources/P1102Utility.icns']:
     expected['Applications/P1102 Utility.app/'+name] = app/name
 with tempfile.TemporaryDirectory() as tmp:
     expanded = Path(tmp)/'expanded'
@@ -42,8 +43,10 @@ with tempfile.TemporaryDirectory() as tmp:
     info=ET.parse(component/'PackageInfo').getroot()
     assert info.attrib['relocatable']=='false' and info.attrib['install-location']=='/'
     distribution=ET.parse(expanded/'Distribution').getroot()
-    assert distribution.find("pkg-ref[@version]").attrib['version']==info.attrib['version']=='1.7'
+    assert distribution.find("pkg-ref[@version]").attrib['version']==info.attrib['version']=='1.7.1'
     assert len(info.find('relocate'))==0
+    with (payload/'Applications/P1102 Utility.app/Contents/Info.plist').open('rb') as plist_file:
+        assert plistlib.load(plist_file)['CFBundleIconFile']=='P1102Utility.icns'
     assert {p.name for p in (component/'Scripts').iterdir()}=={p.name for p in (root/'scripts').iterdir()}
     for p in (root/'scripts').iterdir(): assert (component/'Scripts'/p.name).read_bytes()==p.read_bytes()
     assert distribution.find('domains').attrib=={'enable_anywhere':'false','enable_currentUserHome':'false','enable_localSystem':'true'}
@@ -54,13 +57,12 @@ with tempfile.TemporaryDirectory() as tmp:
             assert (expanded/'Resources'/locale/name).read_bytes()==(root/'installer/resources'/locale/name).read_bytes()
     assert (expanded/'Resources'/distribution.find('license').attrib['file']).read_bytes()==(root/'LICENSE').read_bytes()
     with tarfile.open(payload/'Library/Printers/P1102Native/Source.tar.gz') as archive:
+        archive_files = {item.name for item in archive.getmembers() if item.isfile()}
+        assert archive_files == source_files, (archive_files-source_files, source_files-archive_files)
         for item in archive.getmembers():
             path=Path(item.name)
             assert not path.is_absolute() and '..' not in path.parts and not item.issym() and not item.islnk()
             assert path.parts[0] not in ['build','dist','diagnostics','.git']
             if item.isfile():
                 assert (root/path).is_file() and archive.extractfile(item).read()==(root/path).read_bytes(), str(path)
-        public_files={str(p.relative_to(root)) for folder in ['src','tests','vendor','ppd','installer','scripts'] for p in (root/folder).rglob('*') if p.is_file()}
-        public_files.update(p.name for p in root.iterdir() if p.is_file() and (p.suffix in ['.md','.sh'] or p.name in ['LICENSE','NOTICE','.gitignore','.gitattributes']))
-        assert public_files <= set(archive.getnames()), public_files-set(archive.getnames())
 print('Package contracts passed: exact payload/source, ARM64, signatures, safe modes and fixed destination.')

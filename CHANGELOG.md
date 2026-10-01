@@ -1,5 +1,11 @@
 # Changelog / Přehled vydání
 
+## 1.7.1, 2026-10-01
+
+Reject partial trailing raster headers instead of silently completing damaged jobs, retain delayed nonblocking input through poll, bind USB XML to the requested resource and enforce UTF-8/NUL restrictions. Fix privileged-hook executable lookup and use a manifest-based source archive rebuildable without Git. Add maximum-page/extreme-shift regressions, an original application icon. Installed drivers are not changed automatically.
+
+Opravy tiskových dat, USB/XML a privilegovaných skriptů doplňují samostatně sestavitelné zdroje, regresní testy a vlastní ikonu aplikace. Verze prošla automatickými testy; nové fyzické zkoušky nejsou součástí tohoto vydání.
+
 ## 1.7, 2026-10-01 (driver version 1.7)
 
 Stable release following 1.7-rc1. Adds an English/Czech guided installer, upgrade and removal safeguards, cropped-PDF correctness, a hard serialized-PDF output limit and expanded package/installer tests. The final review corrected the economy-mode validation: EconoMode with density 1 can lose the lightest gray detail.

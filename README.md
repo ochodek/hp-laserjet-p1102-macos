@@ -10,19 +10,21 @@ The project started after a macOS upgrade left the legacy HP queue reporting **â
 
 **[Download the installer](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest)** | [Installation](#installation) | [Compatibility](#compatibility-and-validation) | [Report a problem](https://github.com/ochodek/hp-laserjet-p1102-macos/issues)
 
-## Version 1.7
+## Version 1.7.1
+
+Version 1.7.1 improves handling of incomplete raster input, USB/XML responses and source packaging, and adds an application icon. Physical print results below describe version 1.7; version 1.7.1 has automated validation.
 
 Native toner/status utility, paper and quality options, quiet/power settings, PDF booklets, watermarks and manual duplex. See the [feature comparison](FEATURES.md) and [review findings](REVIEW.md) for verified behavior and limits. The installer includes English/Czech guidance, GPL licence, upgrade checks and an explicit uninstaller.
 
 ## Installation
 
-1. Open [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) and download `HP-P1102-Native-1.7.pkg`. No compilation is needed.
+1. Open [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) and download `HP-P1102-Native-1.7.1.pkg`. No compilation is needed.
 2. Connect the powered-on P1102 by USB, directly or through a working adapter. Load A4 paper.
 3. Open the package and complete installation. macOS requires administrator authorization.
 4. Select **HP LaserJet P1102 Native** in the application's print dialog. Set it as your default in **System Settings, Printers & Scanners** if desired.
 5. Print one page to check your printer's output.
 
-Quit P1102 Utility and finish pending jobs before updating. The installer creates its own queue when it finds exactly one connected P1102. If the printer was disconnected during installation, add it in **Printers & Scanners**, choose **Use: Select Software**, and select **HP LaserJet P1102 Native ARM64, 1.7**. Re-running the installer with the printer connected is another option. Updates refresh this driver's PPD while retaining existing quality choices. A queue-name conflict with another printer stops installation; with multiple P1102 devices, choose the intended one manually. The original HP queue and default printer selection are preserved.
+Quit P1102 Utility and finish pending jobs before updating. The installer creates its own queue when it finds exactly one connected P1102. If the printer was disconnected during installation, add it in **Printers & Scanners**, choose **Use: Select Software**, and select **HP LaserJet P1102 Native ARM64, 1.7.1**. Re-running the installer with the printer connected is another option. Updates refresh this driver's PPD while retaining existing quality choices. A queue-name conflict with another printer stops installation; with multiple P1102 devices, choose the intended one manually. The original HP queue and default printer selection are preserved.
 
 ### macOS security prompts
 
@@ -78,7 +80,7 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` builds the filter, command helper, CLI and utility for this release. `./package.sh` runs the tests and produces the installer, source archive, and checksums in `dist/`. Thirteen raster/protocol contract tests plus device/PDF and installation/removal suites cover decoded image content, copies, tone response, geometry, and malformed input. Local sanitizer checks and analysis of the adapter are described in [SECURITY.md](SECURITY.md).
+`./build.sh` builds the filter, command helper, CLI and utility. `./package.sh` runs tests and produces the installer, source archive and checksums in `dist/`. Raster/protocol, device/PDF and installation/removal suites cover image content, copies, tones, geometry and malformed input. The source archive supports this workflow without `.git`; `SOURCE_MANIFEST` defines its inventory. See [SECURITY.md](SECURITY.md) for sanitizer and analyzer checks.
 
 macOS rasterizes the document; `src/rastertop1102.c` validates the raster and maps grayscale into four exposure levels. Unmodified **foo2zjs/JBIG-KIT** code encodes ZjStream, and the system USB backend sends it to the printer. The installed filter links only to system `libcups` and `libSystem`. See the [tone measurement method (Czech)](tests/TONE_REFERENCE.md) and [upstream provenance](vendor/UPSTREAM.txt).
 
