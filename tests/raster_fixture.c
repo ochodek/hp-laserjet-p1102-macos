@@ -31,6 +31,13 @@ int main(int argc, char **argv)
             if (strcmp(argv[3], "fractional-outside") == 0) h.cupsImagingBBox[2] = 298;
             if (strcmp(argv[3], "fractional-inverted") == 0) h.cupsImagingBBox[0] = 281;
         }
+        if (argc == 9) {
+            h.PageSize[0] = (unsigned)atoi(argv[4]); h.PageSize[1] = (unsigned)atoi(argv[5]);
+            h.ImagingBoundingBox[2] = h.PageSize[0] - 12; h.ImagingBoundingBox[3] = h.PageSize[1] - 12;
+            h.cupsWidth = 1200; h.cupsHeight = 1200;
+            h.cupsMediaType = (unsigned)atoi(argv[6]); h.MediaPosition = (unsigned)atoi(argv[7]);
+            h.cupsCompression = (unsigned)atoi(argv[8]);
+        }
         h.cupsBitsPerColor = h.cupsBitsPerPixel = atoi(argv[1]);
         h.cupsColorSpace = atoi(argv[2]);
         h.cupsNumColors = 1;

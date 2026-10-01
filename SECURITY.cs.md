@@ -1,34 +1,33 @@
-# Bezpečnost
+# Bezpečnost, verze 1.7
 
 [English](SECURITY.md) | **Česky**
 
-Kontrola provedena 1. října 2026. Jde o vibe-coded projekt vyvíjený s pomocí AI.
+Jde o vibe-coded projekt vyvíjený s pomocí AI. Interní kontrola kódu a bezpečnosti proběhla 1. října 2026. Nálezy, opravy, důkazy a zbývající podmínky vydání jsou v [REVIEW.md](REVIEW.md). Nejde o nezávislý audit ani záruku nalezení všech chyb.
 
-Kontrola nenalezla záměrně škodlivé chování. Není to nezávislý bezpečnostní audit ani záruka nepřítomnosti všech chyb.
+## Běh a oprávnění
 
-## Omezení rozsahu
+Nativní rastrový filtr kontroluje černobílý vstup CUPS a používá připnutou verzi kodéru foo2zjs/JBIG. Odkazuje na systémové libcups a libSystem. Nový příkazový filtr a CLI používají Foundation a IOKit, obslužná aplikace navíc Cocoa, PDFKit a PrintCore. Všechny dodávané programy jsou ARM64.
 
-Instalovaný program obsahuje CUPS adaptér, ZjStream enkodér a JBIG enkodér. Dynamicky se váže pouze na systémové `libcups.2.dylib` a `libSystem.B.dylib`. Nemá síťový klient, telemetrii, aktualizátor, shellové příkazy, stahování, přístup ke klíčence ani službu na pozadí. Neinstaluje kernel extension. USB přenos zajišťuje macOS.
+Běhový kód neobsahuje síťového klienta, telemetrii, aktualizátor, spouštění shellu, stahování, přístup k heslům či klíčence, trvalou službu, rozšíření jádra, změnu firmwaru ani tovární reset. Zprávy HTTP jsou přenášeny po USB. Aplikace otevírá dvě rozhraní konkrétního modelu běžným způsobem, bez vynuceného převzetí nebo resetu. Příkazy a hodnoty nastavení pocházejí z pevných seznamů. Uživatelská jména ani názvy dokumentů se nevkládají do příkazů tiskárně.
 
-Linker odstranil nepoužívané CLI, barevné vstupní parséry a JBIG dekodér. Ve výsledném programu nejsou symboly pro spouštění procesů, sockety, připojení k síti ani JBIG dekódování. Volba souboru na vstupu pochází z rozhraní CUPS; program nevytváří vlastní dočasné soubory. Názvy úloh ani uživatelů se nevkládají do tiskového protokolu.
+Instalátor potřebuje správce kvůli souborům ovladače, aplikaci a vlastní frontě CUPS. Programy mají práva 0755, bez setuid. Původní fronta HP i výchozí tiskárna zůstávají zachované. Aplikace běží pod přihlášeným uživatelem a při běžném použití správce nepotřebuje. Tiskové soubory spravuje macOS. Odinstalační skript odstraňuje pouze známé soubory a kontroluje identitu balíčku aplikace.
 
-Filtr nemá setuid bit. Instaluje se jako root:wheel s právy 0755, aby jej běžný uživatel nemohl přepsat. Ochrany CUPS, Gatekeeperu a SIP se nemění. Instalační skript hledá připojenou USB P1102 a založí její novou frontu. Při aktualizaci obnoví PPD a rozlišení pouze vlastní fronty HP_LaserJet_P1102_Native. Původní frontu HP ani výchozí tiskárnu nepřepisuje. URI předává jako citovaný argument, nikdy jej nevyhodnocuje jako příkaz.
+Balík obsahuje rastrový filtr, `commandtop1102`, `p1102ctl`, licenci a úplný zdrojový archiv v `/Library/Printers/P1102Native`, PPD v `/Library/Printers/PPDs/Contents/Resources` a `/Applications/P1102 Utility.app`. Nepřidává trvale spouštěnou službu. Oprávnění pro automatizaci rozhraní použité při vývoji není požadavkem ovladače.
 
-## Provedené kontroly
+## Vstupy a soukromí
 
-* Vlastní C kód se překládá s `-Wall -Wextra -Werror`; jeho kontrola pomocí Clang Static Analyzer neohlásila nález.
-* Ověřen ARM64 strojový kód a platnost jeho ad-hoc podpisu.
-* Zdrojové závislosti mají zaznamenaný původ, revizi a SHA-256.
-* Testy rozbalují skutečná výstupní JBIG data a porovnávají všechny pixely dvou stránek: souřadnice po přesném posunu o 15 sloupců a 31 řádků, zachování posledního řádku, bílé doplnění všech čtyř stran obrazu při zachování přenášených rozměrů A4 z verze 1.4, polaritu, pořadí a počet kopií. Pokrývají 1bitové i 8bitové bílé/černé barevné prostory. U všech 256 šedých ploch se přesně porovnávají počty čtyř úrovní tiskového bodu s měřením referenčního ovladače HP. Další test po oddělení bílého kalibračního okraje porovnává celý dekódovaný obraz s referenčním výstupem HP na proměnlivých odstínech a tenkých čarách, které nebyly použity ke kalibraci. Jde o kontrolu dat; fyzický výtisk je nutné posoudit samostatně.
-* Desetinné okraje z CUPS Raster v2 musí zachovat všechny čtyři rohy obrazu a bílé doplnění. Nečíselné, nekonečné, obrácené a mimostránkové souřadnice se odmítají ještě před kódováním stránky.
-* Prázdné a zkrácené vstupy musí skončit chybou. Extrémní hodnoty v 17 polích hlavičky musí být odmítnuty bez pádu (celkem 34 mutací).
-* Stejné testy prošly i pod AddressSanitizerem a UndefinedBehaviorSanitizerem. Kontrola úniků paměti je v tomto běhu vypnutá.
-* Celý lokální převod Apple rasterizer + nový filtr prošel a dvě požadované kopie vytvořily právě dvě stránky.
+* Rastr prochází kontrolou geometrie, rozměrů, bitové hloubky, formátu, typu a zdroje papíru, kvality, kopií a rozsahů voleb. Paměť stránky je omezená podporovanými fyzickými rozměry. Neúplná stránka končí chybou.
+* Přenosy USB mají časové limity. Při chybě čtení se nepoužije nevyplněná paměť. HTTP má limit celé zprávy 512 KiB a hlavičky 8 KiB, s kontrolou délek a bloků. Neznámá nebo duplicitní hodnota toneru se nevydává za procenta.
+* XML musí být UTF-8. Deklarace DTD a entit jsou odmítány, načítání externích entit je vypnuto. Kontroluje se hloubka, počet uzlů a délky textů. Aktuální a předchozí kazeta mají oddělené cesty k údajům.
+* PDF vybírá uživatel; dokument musí být odemčený a mít povolený tisk. Platí limity velikosti, počtu stran a výstupu. Příprava nepřepisuje originál. Export vyžaduje ukládací dialog, tisk používá systémovou frontu. Interní implementace PDFKit a macOS není součástí tohoto auditu.
+* Grafický export diagnostiky používá vybraná pole a vynechává sériová čísla, uživatelská jména, cesty a obsah dokumentů. CLI naopak vypisuje identitu tiskárny, před sdílením ji odstraň. Vývojové USB záznamy, tiskové soubory a fotografie jsou vynechány z Gitu i zdrojového balíčku.
 
-## Nálezy v převzatém kódu a hranice kontroly
+## Ověření a omezení
 
-Samostatná statická analýza celého `jbig.c` hlásí 13 kandidátů: nepoužitá přiřazení, obecný případ nulového počtu prvků v alokátoru, analýzu indexované inicializace a problémy v dekódovacích větvích. Dekodér není do instalovaného filtru zahrnut. Enkodér dostává výhradně kladné rozměry z povolených formátů, jednu obrazovou rovinu, pevnou velikost pásu 128 a pevné pořadí komprese. Nulové rozměry a neplatné hlavičky filtr odmítá před voláním enkodéru. Indexová tabulka pro používané pořadí inicializuje všechny tři prvky smyčky. Tyto kandidáty se v používané cestě nepodařilo reprodukovat; nejsou zde prezentovány jako automaticky vyřešené chyby celé knihovny.
+Vlastní zdrojové soubory procházejí přísnými varováními kompilátoru a Clang Static Analyzerem. Testy rastru, protokolu, HTTP/XML a PDF běží i s AddressSanitizerem a UndefinedBehaviorSanitizerem; kontrola úniků paměti je při tomto běhu vypnuta. Skutečné výsledky i rozdíl mezi přímým USB testem, integrací fronty a fyzickým tiskem uvádí REVIEW.md.
 
-Při překladu testovací varianty kompilátor upozorňuje na historická volání `sprintf` v nepoužívaných barevných větvích foo2zjs. Tyto větve a volání nejsou ve výsledném instalovaném programu. Převzaté zdroje zůstávají nezměněné, aby se daly porovnat s uvedenou revizí.
+Připnuté zdroje závislostí a jejich kontrolní součty zůstávají stejné. Linker odstraňuje nepoužívané CLI, barevné parsery a dekodér JBIG. Starší analýza celého `jbig.c` ohlásila 13 kandidátů v oblastech nepoužitých přiřazení, nulových alokací, inicializace a dekodéru. Použitý kodér dostává ověřené kladné rozměry, jednu rovinu a pevná nastavení JBIG; příslušná inicializace plní všechny položky. Nálezy se v použité cestě nepodařilo reprodukovat. Historická varování `sprintf` patří do nepoužitých barevných větví, které ve výsledném filtru nejsou. Neznamená to, že celá knihovna nemá žádné chyby.
 
-Testy nepokrývají všechny možné obrázky a úlohy. Funkčnost a bezpečnost systémových knihoven macOS jsou závislostí tohoto ovladače. Instalační balíček není podepsaný Developer ID certifikátem a není notarizovaný; kontrolní součet slouží ke kontrole integrity přeneseného souboru, ne jako náhrada nezávislého potvrzení identity autora.
+Balíček **nemá podpis Developer ID ani notarizaci**. Ad-hoc podpis nepotvrzuje vydavatele. SHA-256 ověřuje neporušenost souboru, nikoli nezávislou důvěryhodnost autora. Kvůli instalaci nevypínej Gatekeeper ani SIP. Budoucí kompatibilita závisí na podpoře CUPS/PPD, rasterizace, IOKit a USB v macOS. Každý druh papíru, chybový stav a verze systému nebyly fyzicky otestovány.
+
+Závěrečná kontrola opravila práci s výřezem a otočením PDF i limit 256 MiB včetně dokončení výstupu. Limit neomezuje celou paměť ani čas PDFKitu, aplikace není izolovaná pomocí App Sandbox. Ořez PDF nenahrazuje bezpečné začernění citlivých údajů. Instalace kontroluje identitu fronty a aplikace i symbolické odkazy; odinstalace odmítne čekající úlohy a frontu patřící jiné tiskárně. Testy odinstalace používají izolované náhrady systémových příkazů, pracovní instalace nebyla při kontrole skutečně odstraněna.

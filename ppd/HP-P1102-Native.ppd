@@ -1,6 +1,6 @@
 *PPD-Adobe: "4.3"
 *FormatVersion: "4.3"
-*FileVersion: "1.6"
+*FileVersion: "1.7"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
 *PCFileName: "P1102ARM.PPD"
@@ -8,7 +8,7 @@
 *Product: "(HP LaserJet Professional P1102)"
 *ModelName: "HP LaserJet P1102 Native"
 *ShortNickName: "HP P1102 Native"
-*NickName: "HP LaserJet P1102 Native ARM64, 1.6"
+*NickName: "HP LaserJet P1102 Native ARM64, 1.7"
 *PSVersion: "(3010.000) 0"
 *LanguageLevel: "3"
 *ColorDevice: False
@@ -20,10 +20,16 @@
 *cupsVersion: 2.0
 *cupsManualCopies: True
 *cupsFilter: "application/vnd.cups-raster 0 /Library/Printers/P1102Native/rastertop1102"
+*cupsFilter: "application/vnd.cups-command 0 /Library/Printers/P1102Native/commandtop1102"
+*cupsCommands: "ReportLevels"
+*APPrinterUtilityPath: "/Applications/P1102 Utility.app"
+*cupsMarkerName Black/Black Toner: ""
+*cupsMarkerNotice: "Supply levels are printer estimates. Refresh in P1102 Utility."
 *DefaultResolution: 600dpi
 *OpenUI *Resolution/Resolution: PickOne
 *OrderDependency: 10 AnySetup *Resolution
-*Resolution 600dpi/600 dpi: "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsColorSpace 0/cupsColorOrder 0>>setpagedevice"
+*Resolution 600dpi/FastRes 600: "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsColorSpace 0/cupsColorOrder 0/cupsCompression 401>>setpagedevice"
+*Resolution 1200dpi/FastRes 1200 (slower): "<</HWResolution[600 600]/cupsBitsPerColor 8/cupsColorSpace 0/cupsColorOrder 0/cupsCompression 1>>setpagedevice"
 *CloseUI: *Resolution
 *OpenUI *PageSize/Paper Size: PickOne
 *OrderDependency: 10 AnySetup *PageSize
@@ -33,6 +39,19 @@
 *PageSize A6/A6: "<</PageSize[297 420]/ImagingBBox null>>setpagedevice"
 *PageSize Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
 *PageSize Legal/US Legal: "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageSize Executive/Executive: "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageSize 8.5x13Custom/8.5 x 13: "<</PageSize[612 936]/ImagingBBox null>>setpagedevice"
+*PageSize B5JIS/B5 JIS: "<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
+*PageSize 16K195x270mm/16K 195 x 270 mm: "<</PageSize[553 765]/ImagingBBox null>>setpagedevice"
+*PageSize 16K184x260mm/16K 184 x 260 mm: "<</PageSize[522 737]/ImagingBBox null>>setpagedevice"
+*PageSize 16K197x273mm/16K 197 x 273 mm: "<</PageSize[558 774]/ImagingBBox null>>setpagedevice"
+*PageSize Postcard/Postcard: "<</PageSize[284 419]/ImagingBBox null>>setpagedevice"
+*PageSize DoublePostcard/Double Postcard: "<</PageSize[567 420]/ImagingBBox null>>setpagedevice"
+*PageSize Env10/Envelope #10: "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+*PageSize Monarch/Envelope Monarch: "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+*PageSize EnvISOB5/Envelope B5: "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+*PageSize EnvC5/Envelope C5: "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+*PageSize EnvDL/Envelope DL: "<</PageSize[312 624]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageSize
 *OpenUI *PageRegion/Paper Region: PickOne
 *OrderDependency: 10 AnySetup *PageRegion
@@ -42,6 +61,19 @@
 *PageRegion A6/A6: "<</PageSize[297 420]/ImagingBBox null>>setpagedevice"
 *PageRegion Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
 *PageRegion Legal/US Legal: "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*PageRegion Executive/Executive: "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageRegion 8.5x13Custom/8.5 x 13: "<</PageSize[612 936]/ImagingBBox null>>setpagedevice"
+*PageRegion B5JIS/B5 JIS: "<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
+*PageRegion 16K195x270mm/16K 195 x 270 mm: "<</PageSize[553 765]/ImagingBBox null>>setpagedevice"
+*PageRegion 16K184x260mm/16K 184 x 260 mm: "<</PageSize[522 737]/ImagingBBox null>>setpagedevice"
+*PageRegion 16K197x273mm/16K 197 x 273 mm: "<</PageSize[558 774]/ImagingBBox null>>setpagedevice"
+*PageRegion Postcard/Postcard: "<</PageSize[284 419]/ImagingBBox null>>setpagedevice"
+*PageRegion DoublePostcard/Double Postcard: "<</PageSize[567 420]/ImagingBBox null>>setpagedevice"
+*PageRegion Env10/Envelope #10: "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+*PageRegion Monarch/Envelope Monarch: "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvISOB5/Envelope B5: "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvC5/Envelope C5: "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvDL/Envelope DL: "<</PageSize[312 624]/ImagingBBox null>>setpagedevice"
 *CloseUI: *PageRegion
 *DefaultImageableArea: A4
 *ImageableArea A4: "16.25 16.25 578.75 825.75"
@@ -55,3 +87,87 @@
 *PaperDimension A6: "297 420"
 *PaperDimension Letter: "612 792"
 *PaperDimension Legal: "612 1008"
+
+*ImageableArea Executive: "16.25 16.25 505.75 739.75"
+*PaperDimension Executive: "522 756"
+*ImageableArea 8.5x13Custom: "16.25 16.25 595.75 919.75"
+*PaperDimension 8.5x13Custom: "612 936"
+*ImageableArea B5JIS: "16.25 16.25 499.75 712.75"
+*PaperDimension B5JIS: "516 729"
+*ImageableArea 16K195x270mm: "16.25 16.25 536.75 748.75"
+*PaperDimension 16K195x270mm: "553 765"
+*ImageableArea 16K184x260mm: "16.25 16.25 505.75 720.75"
+*PaperDimension 16K184x260mm: "522 737"
+*ImageableArea 16K197x273mm: "16.25 16.25 541.75 757.75"
+*PaperDimension 16K197x273mm: "558 774"
+*ImageableArea Postcard: "16.25 16.25 267.75 402.75"
+*PaperDimension Postcard: "284 419"
+*ImageableArea DoublePostcard: "16.25 16.25 550.75 403.75"
+*PaperDimension DoublePostcard: "567 420"
+*ImageableArea Env10: "16.25 16.25 280.75 667.75"
+*PaperDimension Env10: "297 684"
+*ImageableArea Monarch: "16.25 16.25 262.75 523.75"
+*PaperDimension Monarch: "279 540"
+*ImageableArea EnvISOB5: "16.25 16.25 482.75 692.75"
+*PaperDimension EnvISOB5: "499 709"
+*ImageableArea EnvC5: "16.25 16.25 442.75 632.75"
+*PaperDimension EnvC5: "459 649"
+*ImageableArea EnvDL: "16.25 16.25 295.75 607.75"
+*PaperDimension EnvDL: "312 624"
+*HWMargins: 16.25 16.25 16.25 16.25
+*VariablePaperSize: True
+*MaxMediaWidth: "612"
+*MaxMediaHeight: "1008"
+*CustomPageSize True: "pop pop pop <</PageSize[5 -2 roll]/ImagingBBox null>>setpagedevice"
+*ParamCustomPageSize Width: 1 points 216 612
+*ParamCustomPageSize Height: 2 points 360 1008
+*ParamCustomPageSize WidthOffset: 3 points 0 0
+*ParamCustomPageSize HeightOffset: 4 points 0 0
+*ParamCustomPageSize Orientation: 5 int 0 0
+*OpenUI *InputSlot/Paper Source: PickOne
+*OrderDependency: 20 AnySetup *InputSlot
+*DefaultInputSlot: Auto
+*InputSlot Auto/Automatic: "<</MediaPosition 7>>setpagedevice"
+*InputSlot Manual/Manual Feed: "<</MediaPosition 4>>setpagedevice"
+*CloseUI: *InputSlot
+*OpenUI *MediaType/Paper Type: PickOne
+*OrderDependency: 20 AnySetup *MediaType
+*DefaultMediaType: Paper
+*MediaType Paper/Plain: "<</cupsMediaType 1>>setpagedevice"
+*MediaType Light60-74g/Light (60-74 g/m2): "<</cupsMediaType 258>>setpagedevice"
+*MediaType Mid-Weight96-110g/Mid-weight (96-110 g/m2): "<</cupsMediaType 282>>setpagedevice"
+*MediaType Heavy111-130g/Heavy (111-130 g/m2): "<</cupsMediaType 262>>setpagedevice"
+*MediaType ExtraHeavy131-175g/Extra heavy (131-175 g/m2): "<</cupsMediaType 283>>setpagedevice"
+*MediaType TransparencyPaper/Laser transparency: "<</cupsMediaType 2>>setpagedevice"
+*MediaType LabelsPaper/Laser labels: "<</cupsMediaType 265>>setpagedevice"
+*MediaType LetterheadPaper/Letterhead: "<</cupsMediaType 513>>setpagedevice"
+*MediaType EnvelopePaper/Envelope: "<</cupsMediaType 267>>setpagedevice"
+*MediaType PreprintedPaper/Preprinted: "<</cupsMediaType 514>>setpagedevice"
+*MediaType PrepunchedPaper/Prepunched: "<</cupsMediaType 515>>setpagedevice"
+*MediaType ColorPaper/Colored paper: "<</cupsMediaType 512>>setpagedevice"
+*MediaType BondPaper/Bond: "<</cupsMediaType 260>>setpagedevice"
+*MediaType RecycledPaper/Recycled: "<</cupsMediaType 516>>setpagedevice"
+*MediaType RoughPaper/Rough: "<</cupsMediaType 263>>setpagedevice"
+*MediaType VellumPaper/Vellum: "<</cupsMediaType 273>>setpagedevice"
+*CloseUI: *MediaType
+*OpenUI *EconoMode/Save Toner (Draft, less detail): Boolean
+*OrderDependency: 20 AnySetup *EconoMode
+*DefaultEconoMode: False
+*EconoMode False/Off: ""
+*EconoMode True/On: ""
+*CloseUI: *EconoMode
+*OpenUI *pjlJamRecovery/Reprint after Paper Jam: Boolean
+*OrderDependency: 20 AnySetup *pjlJamRecovery
+*DefaultpjlJamRecovery: False
+*pjlJamRecovery False/Off: ""
+*pjlJamRecovery True/On: ""
+*CloseUI: *pjlJamRecovery
+*OpenUI *pjlDensity/Print Density: PickOne
+*OrderDependency: 20 AnySetup *pjlDensity
+*DefaultpjlDensity: 3
+*pjlDensity 1/1 (lightest): ""
+*pjlDensity 2/2: ""
+*pjlDensity 3/3: ""
+*pjlDensity 4/4: ""
+*pjlDensity 5/5: ""
+*CloseUI: *pjlDensity

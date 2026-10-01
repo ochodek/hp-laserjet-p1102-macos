@@ -1,0 +1,12 @@
+#!/bin/sh
+# Shared preflight: never take over a queue belonging to another printer.
+set -eu
+LC_ALL=C
+export LC_ALL
+queue=HP_LaserJet_P1102_Native
+if current=$(/usr/bin/lpstat -v "$queue" 2>/dev/null); then
+    case "$current" in
+        "device for $queue: usb://Hewlett-Packard/HP%20LaserJet%20Professional%20P1102?"*) ;;
+        *) printf '%s\n' 'The native queue name is used by another printer. Its configuration was not changed.' >&2; exit 1 ;;
+    esac
+fi
