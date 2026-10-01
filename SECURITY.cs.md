@@ -1,4 +1,4 @@
-# Bezpečnost, kandidát 1.7
+# Bezpečnost, verze 1.7
 
 [English](SECURITY.md) | **Česky**
 
@@ -29,3 +29,5 @@ Vlastní zdrojové soubory procházejí přísnými varováními kompilátoru a 
 Připnuté zdroje závislostí a jejich kontrolní součty zůstávají stejné. Linker odstraňuje nepoužívané CLI, barevné parsery a dekodér JBIG. Starší analýza celého `jbig.c` ohlásila 13 kandidátů v oblastech nepoužitých přiřazení, nulových alokací, inicializace a dekodéru. Použitý kodér dostává ověřené kladné rozměry, jednu rovinu a pevná nastavení JBIG; příslušná inicializace plní všechny položky. Nálezy se v použité cestě nepodařilo reprodukovat. Historická varování `sprintf` patří do nepoužitých barevných větví, které ve výsledném filtru nejsou. Neznamená to, že celá knihovna nemá žádné chyby.
 
 Balíček **nemá podpis Developer ID ani notarizaci**. Ad-hoc podpis nepotvrzuje vydavatele. SHA-256 ověřuje neporušenost souboru, nikoli nezávislou důvěryhodnost autora. Kvůli instalaci nevypínej Gatekeeper ani SIP. Budoucí kompatibilita závisí na podpoře CUPS/PPD, rasterizace, IOKit a USB v macOS. Každý druh papíru, chybový stav a verze systému nebyly fyzicky otestovány.
+
+Závěrečná kontrola opravila práci s výřezem a otočením PDF i limit 256 MiB včetně dokončení výstupu. Limit neomezuje celou paměť ani čas PDFKitu, aplikace není izolovaná pomocí App Sandbox. Ořez PDF nenahrazuje bezpečné začernění citlivých údajů. Instalace kontroluje identitu fronty a aplikace i symbolické odkazy; odinstalace odmítne čekající úlohy a frontu patřící jiné tiskárně. Testy odinstalace používají izolované náhrady systémových příkazů, pracovní instalace nebyla při kontrole skutečně odstraněna.

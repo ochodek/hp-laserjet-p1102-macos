@@ -12,3 +12,8 @@ build/device-tests
 xcrun clang -arch arm64 -fobjc-arc -Wall -Wextra -Werror \
     src/pdf-tools.m tests/pdf_tests.m -framework Cocoa -framework PDFKit -o build/pdf-tests
 build/pdf-tests
+xcrun clang -arch arm64 -fobjc-arc -Wall -Wextra -Werror -DP1102_PDF_OUTPUT_LIMIT=4096 \
+    src/pdf-tools.m tests/pdf_limit_tests.m -framework Cocoa -framework PDFKit -o build/pdf-limit-tests
+build/pdf-limit-tests
+python3 tests/test_installer.py
+python3 tests/test_uninstall.py

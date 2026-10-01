@@ -2,14 +2,14 @@
 
 [Česky](FEATURES.cs.md)
 
-Version 1.7 is being validated. This is a functional comparison, not a claim of HP certification or identical behavior on every document. The target remains the USB P1102, not P1102w or other models.
+Version 1.7. This is a functional comparison, not a claim of HP certification or identical behavior on every document. The target remains the USB P1102, not P1102w or other models.
 
 ## Printing
 
 | Function | Native implementation |
 | --- | --- |
 | FastRes 600 / FastRes 1200 | Print dialog; both use 600 dpi grayscale input and four exposure levels. The 1200 quality mode can be slower. |
-| EconoMode | Print dialog, job-scoped printer toner-saving command |
+| EconoMode | Print dialog, job-scoped draft mode. With density 1, the lightest nonwhite test field disappeared on the tested printer; use normal mode for faint graphics. |
 | Density 1–5 | Print dialog; default 3 |
 | Recovery after a paper jam | Print dialog; off or automatic reprint |
 | Paper selection | 18 named formats, including envelopes/postcards, and custom 76.2 × 127 to 215.9 × 355.6 mm |
@@ -22,7 +22,7 @@ Version 1.7 is being validated. This is a functional comparison, not a claim of 
 | Watermarks | Utility adds custom text on all output pages or the first output page, with preview and PDF export |
 | Fine placement | Existing 1.6 geometry is preserved. Advanced CUPS options `P1102ShiftX` (-15…68) and `P1102ShiftY` (-31…0) move pixels within the reserved white padding, at 600 dpi. Not a mechanical alignment correction. |
 
-PDF tools accept printable, unlocked PDFs up to 200 MB and 2,000 pages. They create a separate flattened output PDF; they do not edit the source. Printed annotations are retained, but interactive fields, links and digital signature validity are not preserved in the generated copy. Always inspect the preview for important documents. Manual duplex forces one copy and one page per sheet for each pass; booklet imposition is already in the prepared PDF.
+PDF tools accept printable, unlocked PDFs up to 200 MB and 2,000 pages. They create a separate flattened output PDF; they do not edit the source. Printed annotations are retained, but interactive fields, links and digital signature validity are not preserved in the generated copy. Visible CropBox bounds and rotation are retained. The serialized output is limited to 256 MiB, including finalization. Cropping is not redaction: clipped content may remain in the PDF. Always inspect the preview for important documents. Manual duplex forces one copy and one page per sheet for each pass; booklet imposition is already in the prepared PDF.
 
 ## P1102 Utility
 
@@ -31,7 +31,7 @@ Open **Applications → P1102 Utility**, or the printer's utility button if macO
 * Live estimated black-toner percentage, cartridge model, cartridge state and last successful read time.
 * Lifetime and current-cartridge page counts, printer-estimated remaining pages, jam/misfeed counts, event codes, firmware date and configured tray media.
 * Sleep timer, automatic power-off timer and quiet mode, each confirmed by a read-back. Reading status does not change these settings.
-* Configuration, supplies, demo and cleaning-page commands with an explicit user action. Cleaning requires appropriate plain copier paper and takes several minutes. The user physically confirmed the supplies page and its 60% toner reading; configuration, demo and cleaning pages remain untested.
+* Configuration, supplies, demo and cleaning-page commands with an explicit user action. Cleaning requires appropriate plain copier paper and takes several minutes. The user physically confirmed the supplies page and its 60% toner reading; configuration, demo and cleaning pages subsequently completed without errors, confirmed by the user.
 * Diagnostic JSON export using a fixed field allowlist, excluding device and cartridge serial numbers, usernames, paths and document contents.
 * Native CLI `/Library/Printers/P1102Native/p1102ctl` for `status`, `supplies`, `set`, and `page`. CLI status includes the device serial, so redact it before sharing. With multiple connected P1102s, supply the USB serial to the CLI; the GUI refuses an ambiguous selection.
 * CUPS `ReportLevels` command for macOS supply information. The last CUPS value can remain cached; the utility's timestamp distinguishes a fresh USB read. The installed scheduler successfully executed ReportLevels and published a fresh marker value on macOS 27.0.1.

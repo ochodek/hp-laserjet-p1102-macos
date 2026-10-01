@@ -1,18 +1,22 @@
 #!/bin/sh
 # Register only this model when it is connected. Do not change the default printer.
 set -eu
+LC_ALL=C
+export LC_ALL
 queue=HP_LaserJet_P1102_Native
 ppd=/Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd
+. "$(dirname "$0")/check-queue"
 if /usr/bin/lpstat -v "$queue" >/dev/null 2>&1; then
-    /usr/sbin/lpadmin -p "$queue" -P "$ppd" -o Resolution=600dpi
+    /usr/sbin/lpadmin -p "$queue" -P "$ppd"
     exit 0
 fi
 devices=$(/usr/sbin/lpinfo -v) || exit 1
 uri=$(printf '%s\n' "$devices" | /usr/bin/awk '
-    $1 == "direct" && $2 ~ /^usb:\/\/Hewlett-Packard\/HP%20LaserJet%20Professional%20P1102\?/ { print $2; exit }')
+    $1 == "direct" && $2 ~ /^usb:\/\/Hewlett-Packard\/HP%20LaserJet%20Professional%20P1102\?/ { uri=$2; count++ }
+    END { if (count == 1) print uri }')
 if [ -n "$uri" ]; then
     /usr/sbin/lpadmin -p "$queue" -E -v "$uri" -P "$ppd" \
         -D 'HP LaserJet P1102 Native' -o printer-is-shared=false
 else
-    printf '%s\n' 'Driver installed. Connect P1102 and add it in Printers & Scanners using HP LaserJet P1102 Native ARM64, 1.7.'
+    printf '%s\n' 'Driver installed. Automatic setup requires exactly one connected P1102. Add the intended printer in Printers & Scanners using HP LaserJet P1102 Native ARM64, 1.7.'
 fi

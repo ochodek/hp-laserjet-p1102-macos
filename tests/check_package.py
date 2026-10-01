@@ -16,16 +16,20 @@ expected = {
     'Library/Printers/P1102Native/p1102ctl': root/'build/p1102ctl',
     'Library/Printers/P1102Native/LICENSE': root/'LICENSE',
     'Library/Printers/P1102Native/NOTICE': root/'NOTICE',
+    'Library/Printers/P1102Native/uninstall.sh': root/'uninstall.sh',
+    'Library/Printers/P1102Native/Uninstall.command': root/'installer/Uninstall.command',
     'Library/Printers/P1102Native/Source.tar.gz': root/'build/Source.tar.gz',
     'Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd': root/'ppd/HP-P1102-Native.ppd',
 }
 app = root/'build/P1102 Utility.app'
-for p in app.rglob('*'):
-    if p.is_file(): expected['Applications/P1102 Utility.app/'+str(p.relative_to(app))] = p
+for name in ['Contents/Info.plist','Contents/MacOS/P1102Utility','Contents/_CodeSignature/CodeResources','Contents/Resources/LICENSE','Contents/Resources/NOTICE']:
+    expected['Applications/P1102 Utility.app/'+name] = app/name
 with tempfile.TemporaryDirectory() as tmp:
     expanded = Path(tmp)/'expanded'
     subprocess.run(['pkgutil','--expand-full',str(package),str(expanded)],check=True)
     component=expanded/'P1102-component.pkg';payload=component/'Payload'
+    for p in payload.rglob('*'):
+        assert not p.is_symlink(), str(p)
     actual={str(p.relative_to(payload)) for p in payload.rglob('*') if p.is_file()}
     assert actual==set(expected), (actual-set(expected),set(expected)-actual)
     for name, source in expected.items():
@@ -40,7 +44,15 @@ with tempfile.TemporaryDirectory() as tmp:
     distribution=ET.parse(expanded/'Distribution').getroot()
     assert distribution.find("pkg-ref[@version]").attrib['version']==info.attrib['version']=='1.7'
     assert len(info.find('relocate'))==0
-    assert (component/'Scripts/postinstall').read_bytes()==(root/'scripts/postinstall').read_bytes()
+    assert {p.name for p in (component/'Scripts').iterdir()}=={p.name for p in (root/'scripts').iterdir()}
+    for p in (root/'scripts').iterdir(): assert (component/'Scripts'/p.name).read_bytes()==p.read_bytes()
+    assert distribution.find('domains').attrib=={'enable_anywhere':'false','enable_currentUserHome':'false','enable_localSystem':'true'}
+    assert distribution.find('pkg-ref/must-close/app').attrib['id']=='cz.marek.p1102-native.utility'
+    for tag in ['welcome','readme','conclusion']:
+        name=distribution.find(tag).attrib['file']
+        for locale in ['en.lproj','cs.lproj']:
+            assert (expanded/'Resources'/locale/name).read_bytes()==(root/'installer/resources'/locale/name).read_bytes()
+    assert (expanded/'Resources'/distribution.find('license').attrib['file']).read_bytes()==(root/'LICENSE').read_bytes()
     with tarfile.open(payload/'Library/Printers/P1102Native/Source.tar.gz') as archive:
         for item in archive.getmembers():
             path=Path(item.name)

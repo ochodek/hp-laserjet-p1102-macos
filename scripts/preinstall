@@ -1,0 +1,22 @@
+#!/bin/sh
+# Check before payload replacement; no network access or destructive actions.
+set -eu
+if [ "$(/usr/sbin/sysctl -n hw.optional.arm64 2>/dev/null)" != 1 ]; then
+    printf '%s\n' 'P1102 Native requires an Apple Silicon Mac (M1 or newer).' >&2
+    exit 1
+fi
+for path in /Library/Printers/P1102Native '/Applications/P1102 Utility.app' /Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd; do
+    if [ -L "$path" ] || { [ -d "$path" ] && [ -n "$(/usr/bin/find "$path" -type l -print)" ]; }; then
+        printf '%s\n' 'An installation destination is a symbolic link. No files were installed.' >&2
+        exit 1
+    fi
+done
+app='/Applications/P1102 Utility.app'
+if [ -e "$app" ]; then
+    identifier=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Contents/Info.plist" 2>/dev/null) || identifier=
+    if [ "$identifier" != cz.marek.p1102-native.utility ]; then
+        printf '%s\n' 'Another application occupies the utility destination. No files were installed.' >&2
+        exit 1
+    fi
+fi
+exec /bin/sh "$(dirname "$0")/check-queue"
