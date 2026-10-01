@@ -5,6 +5,8 @@
 #include <stdio.h>
 static NSData *mock;
 static NSUInteger cursor, writes;
+static unsigned failWrites;
+static int writeError;
 static NSString *level = @"60";
 p1102_usb *p1102_usb_open(const char *serial, char *error, size_t capacity)
 { (void)serial; (void)error; (void)capacity; return (p1102_usb *)1; }
@@ -13,6 +15,7 @@ p1102_usb *p1102_usb_open_print(const char *serial, char *error, size_t capacity
 int p1102_usb_write(p1102_usb *usb, const void *bytes, size_t length)
 {
     (void)usb; writes++; cursor = 0;
+    if (failWrites) { failWrites--; return writeError; }
     NSString *request = [[NSString alloc] initWithBytes:bytes length:length encoding:NSASCIIStringEncoding];
     NSString *xml = [request containsString:@"ConsumableConfigDyn"] ? [NSString stringWithFormat:@"<ConsumableConfigDyn><ConsumableInfo><ConsumablePercentageLevelRemaining>%@</ConsumablePercentageLevelRemaining><ProductNumber>CE285A</ProductNumber><ConsumableLifeState><ConsumableState>ok</ConsumableState></ConsumableLifeState></ConsumableInfo></ConsumableConfigDyn>",level] : @"<ProductUsageDyn><PrinterSubunit><TotalImpressions>1000</TotalImpressions></PrinterSubunit><ConsumableSubunit><Consumable><TotalImpressions>99</TotalImpressions><EstimatedPagesRemaining>300</EstimatedPagesRemaining><PreviousCartridgeData><TotalImpressions>999999</TotalImpressions></PreviousCartridgeData></Consumable></ConsumableSubunit></ProductUsageDyn>";
     NSData *body = [xml dataUsingEncoding:NSUTF8StringEncoding];
@@ -44,6 +47,16 @@ int main(void)
     error=nil; NSDictionary *s=P1102Supplies(nil,&error); assert(!error&&[s[@"tonerPercent"] isEqual:@60]&&[s[@"tonerState"] isEqual:@"ok"]);
     for(NSString *bad in @[@"-1",@"101",@"unknown",@"60.0",@"",@"999999999999999999999",@"60</ConsumablePercentageLevelRemaining><ConsumablePercentageLevelRemaining>10"]){level=bad;error=nil;s=P1102Supplies(nil,&error);assert(s&&!s[@"tonerPercent"]);}
     level=@"60";error=nil; s=P1102Snapshot(nil,&error); assert([s[@"totalPages"] isEqual:@1000]&&[s[@"cartridgePages"] isEqual:@99]&&[s[@"estimatedPagesRemaining"] isEqual:@300]);
+    /* A transient read-query write can recover once, without masking a
+       persistent failure or replaying a state-changing PJL command. */
+    NSUInteger count=writes; failWrites=1; writeError=P1102_USB_TRANSIENT; error=nil;
+    assert(P1102Supplies(nil,&error)&&!error&&writes==count+2);
+    count=writes; failWrites=3; error=nil;
+    assert(!P1102Supplies(nil,&error)&&error&&writes==count+2);
+    count=writes; failWrites=1; writeError=-1; error=nil;
+    assert(!P1102Supplies(nil,&error)&&error&&writes==count+1);
+    count=writes; failWrites=1; writeError=P1102_USB_TRANSIENT; error=nil;
+    assert(!P1102Set(nil,@"QuietMode",@"OFF",&error)&&error&&writes==count+1);
     NSUInteger before=writes;error=nil;assert(!P1102Set(nil,@"QuietMode",@"ON\r\n@PJL RESET",&error)&&error&&writes==before);
     error=nil;assert(!P1102InternalPage(nil,@"factoryReset",&error)&&error&&writes==before);
     assert([P1102SerialFromURI(@"usb://Hewlett-Packard/HP%20LaserJet%20Professional%20P1102?serial=TEST") isEqual:@"TEST"]);

@@ -1,4 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
+/* Adapted 2026-10-01 from foo2zjs P1102 job framing, Rick Richardson and
+ * contributors. Original source and notices: vendor/foo2zjs/foo2zjs.c. */
 #ifndef P1102_JOB_H
 #define P1102_JOB_H
 #include <stdio.h>

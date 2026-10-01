@@ -137,7 +137,17 @@ static NSData *request(NSString *serial, NSString *resource, NSError **error)
     NSString *header = [NSString stringWithFormat:@"GET /DevMgmt/%@.xml HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\nContent-Length: 0\r\n\r\n", resource];
     NSMutableData *wire = [[header dataUsingEncoding:NSUTF8StringEncoding] mutableCopy];
     NSData *result = nil;
-    if (p1102_usb_write(usb, wire.bytes, wire.length)) failure(error, @"Cannot send the USB request.");
+    int sent = p1102_usb_write(usb, wire.bytes, wire.length);
+    /* A backend starting up can invalidate a USB transfer. Only this GET is
+       safe to repeat; PJL settings and page requests must never be replayed. */
+    if (sent == P1102_USB_TRANSIENT) {
+        p1102_usb_close(usb);
+        struct timespec delay = {0, 100000000}; nanosleep(&delay, NULL);
+        usb = p1102_usb_open(serial.UTF8String, message, sizeof(message));
+        if (!usb) { failure(error, @(message)); return nil; }
+        sent = p1102_usb_write(usb, wire.bytes, wire.length);
+    }
+    if (sent) failure(error, @"Cannot send the USB request.");
     else {
         NSMutableData *response = [NSMutableData data]; double deadline = monotonic() + 5;
         while (monotonic() < deadline && response.length < limit) {

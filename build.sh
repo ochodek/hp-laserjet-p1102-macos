@@ -26,7 +26,8 @@ for program in commandtop1102 device-cli; do
     codesign --force --sign - "build/$output"
 done
 app='build/P1102 Utility.app'
-mkdir -p "$app/Contents/MacOS"
+mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
+cp LICENSE NOTICE "$app/Contents/Resources/"
 cp installer/utility/Info.plist "$app/Contents/Info.plist"
 xcrun clang -arch arm64 -mmacosx-version-min=11.0 -O2 -fobjc-arc \
     -Wall -Wextra -Werror src/device.m src/pdf-tools.m src/utility.m build/usb.o \

@@ -50,6 +50,20 @@ class DriverTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1, options)
             self.assertEqual(result.stdout, b'')
 
+    def test_cups_boolean_serialization_preserves_economy_and_jam_recovery_choices(self):
+        raster = subprocess.check_output([str(ROOT / 'build/raster_fixture'), '8', '0'])
+        for options, economy, recovery in [
+            ('noEconoMode nopjlJamRecovery', 'OFF', 'OFF'),
+            ('EconoMode pjlJamRecovery', 'ON', 'AUTO'),
+            ('EconoMode=true pjlJamRecovery=FALSE', 'ON', 'OFF'),
+            ('EconoMode=fAlSe pjlJamRecovery=TrUe', 'OFF', 'AUTO'),
+        ]:
+            with self.subTest(options=options):
+                result = run_filter(raster, options)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn(f'@PJL SET ECONOMODE={economy}'.encode(), result.stdout)
+                self.assertIn(f'@PJL SET JAMRECOVERY={recovery}'.encode(), result.stdout)
+
     def test_supported_media_and_quality_match_hp_protocol_codes(self):
         media = [1,2,258,282,262,283,265,513,267,514,515,512,260,516,263,273]
         papers = [(595,842,9),(420,595,11),(297,420,70),(612,792,1),(612,1008,5),

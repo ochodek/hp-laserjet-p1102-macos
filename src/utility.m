@@ -16,7 +16,14 @@ static NSTextField *label(NSString *text) { return [NSTextField wrappingLabelWit
 static NSStackView *stack(NSArray<NSView *> *views)
 {
     NSStackView *s = [NSStackView stackViewWithViews:views]; s.orientation = NSUserInterfaceLayoutOrientationVertical;
-    s.alignment = NSLayoutAttributeLeading; s.spacing = 12; s.edgeInsets = NSEdgeInsetsMake(18, 18, 18, 18); return s;
+    s.alignment = NSLayoutAttributeLeading; s.spacing = 12; s.edgeInsets = NSEdgeInsetsMake(18, 18, 18, 18);
+    for (NSView *view in views) {
+        if ([view isKindOfClass:NSTextField.class] && ![(NSTextField *)view isEditable]) {
+            [view.widthAnchor constraintEqualToAnchor:s.widthAnchor constant:-36].active = YES;
+            [view setContentCompressionResistancePriority:NSLayoutPriorityDefaultLow forOrientation:NSLayoutConstraintOrientationHorizontal];
+        }
+    }
+    return s;
 }
 @interface P1102App : NSObject <NSApplicationDelegate>
 @property NSWindow *window, *preview;
@@ -39,6 +46,17 @@ static NSStackView *stack(NSArray<NSView *> *views)
 { NSAlert *a = [NSAlert new]; a.messageText = @"P1102 Utility"; a.informativeText = text; [a runModal]; }
 - (BOOL)confirm:(NSString *)text
 { NSAlert *a = [NSAlert new]; a.messageText = text; [a addButtonWithTitle:L(@"Continue", @"Pokračovat")]; [a addButtonWithTitle:L(@"Cancel", @"Zrušit")]; return [a runModal] == NSAlertFirstButtonReturn; }
+- (void)about:(id)sender
+{
+    (void)sender; NSAlert *a = [NSAlert new]; a.messageText = @"P1102 Utility 1.7";
+    a.informativeText = L(@"Independent community software for HP LaserJet P1102 printers. Maintained by Marek Ochodek and contributors, 2026. Vibe-coded with AI assistance. Not affiliated with or endorsed by HP or Apple.\n\nGPL version 2 or later; you may modify and redistribute under that licence. No warranty, to the extent permitted by law. Includes foo2zjs by Rick Richardson, Robert Szalai and contributors, and JBIG-KIT by Markus Kuhn. Full notices are in the app's Resources/NOTICE.\n\nMatching source: /Library/Printers/P1102Native/Source.tar.gz",
+        @"Nezávislý komunitní software pro tiskárny HP LaserJet P1102. Spravuje Marek Ochodek a přispěvatelé, 2026. Vibe-coded s pomocí AI. Bez propojení s HP či Apple a bez jejich schválení.\n\nGPL verze 2 nebo novější, dovoluje úpravy a další šíření podle této licence. Bez záruky v rozsahu dovoleném právem. Obsahuje foo2zjs autorů Ricka Richardsona, Roberta Szalaie a přispěvatelů a JBIG-KIT Markuse Kuhna. Úplná oznámení jsou v Resources/NOTICE aplikace.\n\nOdpovídající zdroje: /Library/Printers/P1102Native/Source.tar.gz");
+    [a addButtonWithTitle:L(@"Close",@"Zavřít")]; [a addButtonWithTitle:L(@"View licence",@"Zobrazit licenci")];
+    if ([a runModal] == NSAlertSecondButtonReturn) {
+        NSURL *url = [NSBundle.mainBundle URLForResource:@"LICENSE" withExtension:nil];
+        if (!url || ![NSWorkspace.sharedWorkspace openURL:url]) [self alert:L(@"Cannot open the bundled licence.",@"Přiloženou licenci nelze otevřít.")];
+    }
+}
 - (void)setWorking:(BOOL)working
 { _busy = working; for (NSControl *c in _controls) c.enabled = !working; _message.stringValue = working ? L(@"Communicating with the printer…", @"Komunikuji s tiskárnou…") : @""; }
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
@@ -68,10 +86,18 @@ static NSStackView *stack(NSArray<NSView *> *views)
     _booklet = [self popup:@[L(@"Original page layout",@"Původní rozložení"),L(@"A4 booklet, left binding",@"Brožura A4, vazba vlevo"),L(@"A4 booklet, right binding",@"Brožura A4, vazba vpravo")]];
     NSStackView *pdf = stack(@[label(L(@"PDF tools work locally. The system print dialog also provides copies, page ranges, scaling, presets and multiple pages per sheet.",@"Nástroje PDF pracují místně. Systémový tiskový dialog nabízí také kopie, rozsahy stránek, měřítko, předvolby a více stránek na list.")), [self button:L(@"Open PDF…",@"Otevřít PDF…") action:@selector(openPDF:)], _pdfName, _booklet, _watermark, _firstOnly, [self button:L(@"Prepare and preview",@"Připravit a zobrazit náhled") action:@selector(prepare:)], [self button:L(@"Save prepared PDF…",@"Uložit připravené PDF…") action:@selector(savePDF:)], [self button:L(@"Print prepared PDF…",@"Vytisknout připravené PDF…") action:@selector(printPDF:)], label(L(@"Manual duplex uses one copy and the whole document. Finish pass 1 before reinserting the stack. Run a four-page orientation test first.",@"Ruční oboustranný tisk používá jednu kopii celého dokumentu. Před vložením stohu zpět vyčkej na dokončení prvního průchodu. Nejdřív ověř orientaci na čtyřech stránkách.")), _shortEdge, [self button:L(@"1. Print front sides…",@"1. Vytisknout přední strany…") action:@selector(fronts:)], [self button:L(@"2. Reinsert stack and print backs…",@"2. Vložit stoh zpět a vytisknout rub…") action:@selector(backs:)]]);
     for (NSArray *entry in @[@[L(@"Printer",@"Tiskárna"),status], @[L(@"Settings",@"Nastavení"),settings], @[L(@"PDF tools",@"Nástroje PDF"),pdf]]) {
-        NSTabViewItem *tab = [[NSTabViewItem alloc] initWithIdentifier:entry[0]]; tab.label = entry[0]; tab.view = entry[1]; [tabs addTabViewItem:tab];
+        NSView *container = [NSView new]; NSStackView *content = entry[1];
+        content.translatesAutoresizingMaskIntoConstraints = NO; [container addSubview:content];
+        [NSLayoutConstraint activateConstraints:@[[content.leadingAnchor constraintEqualToAnchor:container.leadingAnchor],
+            [content.trailingAnchor constraintEqualToAnchor:container.trailingAnchor],
+            [content.topAnchor constraintEqualToAnchor:container.topAnchor],
+            [content.bottomAnchor constraintLessThanOrEqualToAnchor:container.bottomAnchor]]];
+        NSTabViewItem *tab = [[NSTabViewItem alloc] initWithIdentifier:entry[0]]; tab.label = entry[0]; tab.view = container; [tabs addTabViewItem:tab];
     }
     tabs.frame = NSInsetRect(_window.contentView.bounds, 12, 12); tabs.autoresizingMask = NSViewWidthSizable|NSViewHeightSizable; [_window.contentView addSubview:tabs];
     NSMenu *menu = [NSMenu new]; NSMenuItem *app = [NSMenuItem new]; NSMenu *appMenu = [NSMenu new];
+    [appMenu addItemWithTitle:L(@"About P1102 Utility…",@"O aplikaci P1102 Utility…") action:@selector(about:) keyEquivalent:@""];
+    [appMenu addItem:NSMenuItem.separatorItem];
     [appMenu addItemWithTitle:L(@"Quit P1102 Utility",@"Ukončit P1102 Utility") action:@selector(terminate:) keyEquivalent:@"q"]; app.submenu = appMenu; [menu addItem:app]; NSApp.mainMenu = menu;
     [_window center]; [_window makeKeyAndOrderFront:nil]; [NSApp activateIgnoringOtherApps:YES]; [self refresh:nil];
 }
@@ -200,7 +226,7 @@ static NSStackView *stack(NSArray<NSView *> *views)
 - (void)backs:(id)sender
 {
     (void)sender; if (!_duplexPDF) { [self alert:L(@"Print front sides first.",@"Nejdřív vytiskni přední strany.")]; return; }
-    if (![self confirm:L(@"Wait until all fronts have printed. Keep the stack in order and reinsert it printed side down, with its orientation unchanged. Ready to print backs?",@"Vyčkej na vytištění všech předních stran. Ponech pořadí listů a vlož stoh potištěnou stranou dolů, bez změny orientace. Vytisknout rub?")]) return;
+    if (![self confirm:L(@"Wait until all fronts have printed, then remove unused paper from the input tray. Move the whole output stack straight into the input tray, printed side down. Keep the sheet order and do not turn the stack around. Ready to print backs?",@"Vyčkej na vytištění všech předních stran a vyndej čistý papír z podavače. Celý stoh přenes přímo z výstupu do podavače, potištěnou stranou dolů. Neměň pořadí listů a stoh neotáčej. Vytisknout rub?")]) return;
     NSError *error = nil; PDFDocument *back = P1102PDFPass(_duplexPDF,YES,_shortEdge.state == NSControlStateValueOn,&error);
     if (!back) { [self alert:error.localizedDescription]; return; }
     if ([self printDocument:back manual:YES]) _duplexPDF = nil;

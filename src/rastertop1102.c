@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include "halftone.h"
 
@@ -52,8 +53,8 @@ static int integer_option(cups_option_t *options, int count, const char *name, i
 static int bool_option(cups_option_t *options, int count, const char *name)
 {
     const char *value = cupsGetOption(name, count, options);
-    if (!value || !strcmp(value, "False")) return 0;
-    if (!strcmp(value, "True")) return 1;
+    if (!value || !strcasecmp(value, "False")) return 0;
+    if (!strcasecmp(value, "True")) return 1;
     fail("Invalid boolean print option."); return 0;
 }
 

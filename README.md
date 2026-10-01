@@ -1,4 +1,4 @@
-# HP LaserJet P1102 driver for macOS and Apple Silicon
+# P1102 Native: driver for HP LaserJet P1102 on macOS
 
 **English** | [Česky](README.cs.md)
 
@@ -78,7 +78,7 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` builds the filter, command helper, CLI and utility on this branch. `./package.sh` runs the tests and produces the installer, source archive, and checksums in `dist/`. Eleven raster/protocol contract tests plus device/PDF suites cover decoded image content, copies, tone response, geometry, and malformed input. Local sanitizer checks and analysis of the adapter are described in [SECURITY.md](SECURITY.md).
+`./build.sh` builds the filter, command helper, CLI and utility on this branch. `./package.sh` runs the tests and produces the installer, source archive, and checksums in `dist/`. Twelve raster/protocol contract tests plus device/PDF suites cover decoded image content, copies, tone response, geometry, and malformed input. Local sanitizer checks and analysis of the adapter are described in [SECURITY.md](SECURITY.md).
 
 macOS rasterizes the document; `src/rastertop1102.c` validates the raster and maps grayscale into four exposure levels. Unmodified **foo2zjs/JBIG-KIT** code encodes ZjStream, and the system USB backend sends it to the printer. The installed filter links only to system `libcups` and `libSystem`. See the [tone measurement method (Czech)](tests/TONE_REFERENCE.md) and [upstream provenance](vendor/UPSTREAM.txt).
 
@@ -97,3 +97,5 @@ This removes the native queue and its driver files only. If it was your default 
 [GPL-2.0-or-later](LICENSE). Includes foo2zjs and JBIG-KIT work by Rick Richardson, Robert Szalai, Markus Kuhn, and other contributors. Original notices and the pinned source revision are preserved in `vendor/`.
 
 This is a community project, not an HP or Apple product. No proprietary HP driver executable or printer firmware is distributed. See [release history](CHANGELOG.md).
+
+Licence inventory, source-delivery checks, trademark use and the limits of this review are recorded in [LEGAL.md](LEGAL.md). See [NOTICE](NOTICE) for attribution and distribution notices. No guarantee of freedom from legal claims is made.

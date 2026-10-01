@@ -17,8 +17,8 @@ Version 1.7 is being validated. This is a functional comparison, not a claim of 
 | Paper source | Automatic or manual feed |
 | Copies, collating, page ranges, scaling, orientation, reverse order, N-up, saved presets | macOS print dialog, subject to the printing application's options |
 | Different paper for covers | Print cover and body page ranges separately, choosing the appropriate paper type for each job. There is no automatic cover-insertion workflow. |
-| Manual two-sided printing | P1102 Utility, PDF workflow with separate front/back passes, long/short-edge binding and blank-back padding. Not an automatic duplexer or an in-dialog duplex implementation for every application. Physical stack orientation still needs validation. |
-| Booklets | Utility prepares A4 landscape PDFs for left/right binding and pads to multiples of four pages; preview before printing |
+| Manual two-sided printing | P1102 Utility, PDF workflow with separate front/back passes, long/short-edge binding and blank-back padding. Not an automatic duplexer or an in-dialog duplex implementation for every application. A four-page test on the connected printer confirmed pairs 1/2 and 3/4 with upright book-style turning after transferring the stack unchanged. |
+| Booklets | Utility prepares A4 landscape PDFs for left/right binding and pads to multiples of four pages; preview before printing. Physical four-page, left-bound booklet with watermark confirmed on one P1102. |
 | Watermarks | Utility adds custom text on all output pages or the first output page, with preview and PDF export |
 | Fine placement | Existing 1.6 geometry is preserved. Advanced CUPS options `P1102ShiftX` (-15…68) and `P1102ShiftY` (-31…0) move pixels within the reserved white padding, at 600 dpi. Not a mechanical alignment correction. |
 
