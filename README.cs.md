@@ -12,7 +12,7 @@ Projekt vznikl po aktualizaci macOS, kdy původní tisková fronta HP hlásila *
 
 ## Vývojová verze 1.7
 
-Tato větev přidává nativní nástroj pro toner a stav tiskárny, volby papíru a kvality, tichý režim, časovače a PDF nástroje pro brožury, vodoznaky a ruční duplex. Podrobnosti najdete v [přehledu funkcí](FEATURES.cs.md) a [zprávě z kontroly kódu](REVIEW.md). Jde o kandidáta k ověření, nikoli o plně prověřenou náhradu každého postupu HP. Publikovaná 1.6 zůstává stabilním základem popsaným níže.
+Tato větev přidává nativní nástroj pro toner a stav tiskárny, volby papíru a kvality, tichý režim, časovače a PDF nástroje pro brožury, vodoznaky a ruční duplex. Podrobnosti najdete v [přehledu funkcí](FEATURES.cs.md) a [zprávě z kontroly kódu](REVIEW.md). Jde o kandidáta k ověření, nikoli o plně prověřenou náhradu každého postupu HP. Publikovaná 1.6 zůstává stabilním základem popsaným níže. [Testovací vydání 1.7](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/tag/v1.7-rc1) obsahuje `HP-P1102-Native-1.7.pkg`, odpovídající zdroje a kontrolní součty. Instalace má stejný postup jako níže; model tiskárny pak uvádí verzi 1.7.
 
 ## Instalace
 

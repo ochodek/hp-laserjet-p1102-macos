@@ -12,7 +12,7 @@ The project started after a macOS upgrade left the legacy HP queue reporting **â
 
 ## Development version 1.7
 
-This branch adds a native toner/status utility, paper and quality options, quiet/power settings, and PDF booklet, watermark and manual-duplex workflows. See the [feature comparison](FEATURES.md) and [review findings](REVIEW.md). It is a validation candidate, not yet a fully tested replacement for every HP workflow. Published 1.6 remains the stable baseline described below.
+This branch adds a native toner/status utility, paper and quality options, quiet/power settings, and PDF booklet, watermark and manual-duplex workflows. See the [feature comparison](FEATURES.md) and [review findings](REVIEW.md). It is a validation candidate, not yet a fully tested replacement for every HP workflow. Published 1.6 remains the stable baseline described below. The [1.7 test release](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/tag/v1.7-rc1) includes `HP-P1102-Native-1.7.pkg`, matching source and checksums. Install it using the same steps below; the installed model reports version 1.7.
 
 ## Installation
 
