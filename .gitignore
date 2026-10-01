@@ -1,0 +1,5 @@
+/build/
+/dist/
+/diagnostics/
+*.DS_Store
+._*

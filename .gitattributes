@@ -1,0 +1,4 @@
+* text=auto eol=lf
+# Preserve upstream bytes so vendor/SHA256SUMS works in fresh checkouts.
+vendor/** -text -whitespace linguist-vendored
+tests/hp-tone-reference.csv -text whitespace=cr-at-eol

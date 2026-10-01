@@ -1,0 +1,8 @@
+foo2zjs and bundled JBIG-KIT sources, unmodified.
+Source: https://github.com/OpenPrinting/foo2zjs
+Commit: 80499ed5bf6caa2963ad337e37cfda78a80aab1e
+Retrieved: 2026-10-01
+License: GPL-2.0-or-later, see foo2zjs/COPYING and source headers.
+Authors: Rick Richardson, Robert Szalai, Markus Kuhn and contributors.
+The CLI main symbol is renamed at compile time; this project calls its
+existing page encoder from a CUPS raster filter.
