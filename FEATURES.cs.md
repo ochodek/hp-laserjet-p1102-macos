@@ -31,7 +31,7 @@ Otevři **Aplikace, P1102 Utility**, případně tlačítko nástroje tiskárny,
 * Živý odhad zbývajícího černého toneru, model a stav kazety, čas úspěšného načtení.
 * Celkový počet stran, strany s aktuální kazetou, odhad zbývajících stran, počty zaseknutí a chyb podání, kódy událostí, datum firmwaru a nastavený papír v zásobníku.
 * Uspávání, automatické vypnutí a tichý režim; každou změnu potvrzuje zpětné přečtení. Samotné čtení stavu nastavení nemění.
-* Příkazy pro konfigurační stránku, stav spotřebního materiálu, ukázku a čištění. Spouštějí se výslovným tlačítkem. Čištění vyžaduje vhodný kancelářský papír a trvá několik minut. Tyto akce ještě potřebují fyzické ověření.
+* Příkazy pro konfigurační stránku, stav spotřebního materiálu, ukázku a čištění. Spouštějí se výslovným tlačítkem. Čištění vyžaduje vhodný kancelářský papír a trvá několik minut. Uživatel fyzicky potvrdil stránku spotřebního materiálu s údajem 60 % toneru; konfigurační, ukázková a čisticí stránka zatím ověřené nejsou.
 * Export diagnostiky do JSON z pevně vybraných polí, bez sériových čísel, uživatelských jmen, cest a obsahu dokumentů.
 * Nativní příkazový nástroj `/Library/Printers/P1102Native/p1102ctl`: `status`, `supplies`, `set`, `page`. Výpis CLI obsahuje sériové číslo tiskárny, před sdílením ho odstraň. Při více připojených P1102 lze CLI zadat konkrétní sériové číslo USB; grafická aplikace nejednoznačný výběr odmítne.
 * Příkaz CUPS `ReportLevels` pro údaje o náplni v macOS. CUPS může držet starší hodnotu; čas v obslužné aplikaci ukazuje čerstvé čtení z USB. Instalovaná fronta na macOS 27.0.1 úspěšně spustila ReportLevels a zveřejnila čerstvou hodnotu. Ukazatel byl ověřen i přímo v Nastavení systému, Volby a spotřební materiál, Úrovně náplní.

@@ -31,7 +31,7 @@ Open **Applications → P1102 Utility**, or the printer's utility button if macO
 * Live estimated black-toner percentage, cartridge model, cartridge state and last successful read time.
 * Lifetime and current-cartridge page counts, printer-estimated remaining pages, jam/misfeed counts, event codes, firmware date and configured tray media.
 * Sleep timer, automatic power-off timer and quiet mode, each confirmed by a read-back. Reading status does not change these settings.
-* Configuration, supplies, demo and cleaning-page commands with an explicit user action. Cleaning requires appropriate plain copier paper and takes several minutes. These actions still require physical verification in this release candidate.
+* Configuration, supplies, demo and cleaning-page commands with an explicit user action. Cleaning requires appropriate plain copier paper and takes several minutes. The user physically confirmed the supplies page and its 60% toner reading; configuration, demo and cleaning pages remain untested.
 * Diagnostic JSON export using a fixed field allowlist, excluding device and cartridge serial numbers, usernames, paths and document contents.
 * Native CLI `/Library/Printers/P1102Native/p1102ctl` for `status`, `supplies`, `set`, and `page`. CLI status includes the device serial, so redact it before sharing. With multiple connected P1102s, supply the USB serial to the CLI; the GUI refuses an ambiguous selection.
 * CUPS `ReportLevels` command for macOS supply information. The last CUPS value can remain cached; the utility's timestamp distinguishes a fresh USB read. The installed scheduler successfully executed ReportLevels and published a fresh marker value on macOS 27.0.1.

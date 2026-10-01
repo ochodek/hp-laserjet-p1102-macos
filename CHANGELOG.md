@@ -2,11 +2,11 @@
 
 ## 1.7-rc1, 2026-10-01 (driver version 1.7)
 
-Native USB toner/status utility and CUPS ReportLevels; additional media, paper sizes, custom sizes, FastRes quality, EconoMode, density and jam recovery. Native power/quiet controls, internal-page commands, privacy-limited diagnostics, PDF watermark/booklet and manual duplex. Default print data retain 1.6 calibration. Physical validation and scheduler integration gates are tracked in [REVIEW.md](REVIEW.md).
+Native USB toner/status utility and CUPS ReportLevels; additional media, paper sizes, custom sizes, FastRes quality, EconoMode, density and jam recovery. Native power/quiet controls, internal-page commands, privacy-limited diagnostics, PDF watermark/booklet and manual duplex. Default print data retain 1.6 calibration. Physical validation and remaining coverage limits are tracked in [REVIEW.md](REVIEW.md).
 
-The installed GUI passed physical manual-duplex and watermarked-booklet tests. Both quality/economy scheduler jobs completed after fixing CUPS boolean serialization; their final appearance and the internal supplies page await user confirmation. Long utility instructions wrap, and macOS Supply Levels showed a fresh toner value. Licence notices, complete matching source, package checks accompany the installer.
+The installed GUI passed physical manual-duplex and watermarked-booklet tests. Both quality/economy scheduler jobs completed after fixing CUPS boolean serialization; the user confirmed readable output, lighter economy printing and the internal supplies page showing 60% toner on 1 October 2026. Long utility instructions wrap, and macOS Supply Levels showed a fresh toner value. Licence notices, complete matching source, package checks accompany the installer.
 
-Nativní nástroj doplňuje toner, nastavení tiskárny a PDF postupy. Uživatel fyzicky potvrdil ruční duplex a brožuru s vodoznakem. Opravené zalamování textu, volby CUPS a balení licencí prošly kontrolami; konečné potvrzení posledních zkoušek kvality a interní stránky je uvedeno ve zprávě REVIEW.md.
+Nativní nástroj doplňuje toner, nastavení tiskárny a PDF postupy. Uživatel fyzicky potvrdil ruční duplex a brožuru s vodoznakem. Opravené zalamování textu, volby CUPS a balení licencí prošly kontrolami; uživatel potvrdil i poslední zkoušky kvality, světlejší úsporný tisk a interní stránku se stavem toneru 60 %. Podrobnosti uvádí REVIEW.md.
 
 ## 1.6, 2026-10-01
 

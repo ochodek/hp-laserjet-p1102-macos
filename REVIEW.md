@@ -1,6 +1,6 @@
 # Code review and security review, 1.7 candidate
 
-Date: 1 October 2026. This is an internal review performed by the same AI coding agent that implemented the change, not an independent audit, penetration-test certificate or vendor approval. Open items below are release gates, not successful tests.
+Date: 1 October 2026. This is an internal review performed by the same AI coding agent that implemented the change, not an independent audit, penetration-test certificate or vendor approval. Physical confirmations and remaining coverage limits are recorded separately below.
 
 ## Scope and method
 
@@ -61,9 +61,13 @@ The app reads PDFs the user selects and writes only explicit exports; system pri
 
 The supplied package uses ad-hoc code signatures. There is no Developer ID signing or notarization. Bounds and tests lower risk but do not prove that the driver is free of every vulnerability. Existing vendor-code findings and unsigned-package limitations are described in SECURITY.md.
 
-## Remaining release gates
+## Physical confirmation
 
-* A four-page manual duplex test through the installed GUI printed fronts 1/3 and backs 4/2. The user confirmed correct 1/2 and 3/4 pairing and upright book-style turning on 1 October 2026. A four-page left-bound booklet with a watermark was then printed on one sheet through both passes; the user confirmed page order, orientation and watermark. Both quality modes, toner-saving/density effects and internal pages still need physical confirmation. Do not trigger cleaning automatically merely to satisfy a test count.
+* A four-page manual duplex test through the installed GUI printed fronts 1/3 and backs 4/2. The user confirmed correct 1/2 and 3/4 pairing and upright book-style turning on 1 October 2026. A four-page left-bound booklet with a watermark was then printed on one sheet through both passes; the user confirmed page order, orientation and watermark. On 1 October 2026, the user also confirmed all three final sheets: FastRes 1200 with economy off had readable text, continuous thin lines and distinguishable gray fields; FastRes 600 with economy on and density 1 was lighter but readable, without streaks or missing content; the internal supplies page reported 60% black toner, matching the last native reading. This validates the tested combination of economy and density, not every density value independently.
+
+## Remaining coverage limits
+
+* Configuration, demo and cleaning pages were not physically validated. Do not trigger cleaning automatically merely to satisfy a test count.
 * Validate actual paper feeding before claiming envelope/heavy-stock support beyond protocol parity. Do not test inappropriate media in the printer.
 * Second Mac and older macOS releases remain untested; macOS 28 compatibility cannot be promised.
 
