@@ -12,6 +12,8 @@ The project started after a macOS upgrade left the legacy HP queue reporting **â
 
 ## Version 1.7
 
+The public release remains 1.7. This branch prepares **1.7.1, unreleased**. The [audit](AUDIT-2026-10-01.md) records repairs, executed checks and remaining conditions. This audit did not install or physically print with the new package.
+
 Native toner/status utility, paper and quality options, quiet/power settings, PDF booklets, watermarks and manual duplex. See the [feature comparison](FEATURES.md) and [review findings](REVIEW.md) for verified behavior and limits. The installer includes English/Czech guidance, GPL licence, upgrade checks and an explicit uninstaller.
 
 ## Installation
@@ -78,7 +80,7 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` builds the filter, command helper, CLI and utility for this release. `./package.sh` runs the tests and produces the installer, source archive, and checksums in `dist/`. Thirteen raster/protocol contract tests plus device/PDF and installation/removal suites cover decoded image content, copies, tone response, geometry, and malformed input. Local sanitizer checks and analysis of the adapter are described in [SECURITY.md](SECURITY.md).
+`./build.sh` builds the filter, command helper, CLI and utility. `./package.sh` runs tests and produces the installer, source archive and checksums in `dist/`. Raster/protocol, device/PDF and installation/removal suites cover image content, copies, tones, geometry and malformed input. The source archive supports this workflow without `.git`; `SOURCE_MANIFEST` defines its inventory. See [SECURITY.md](SECURITY.md) for sanitizer and analyzer checks.
 
 macOS rasterizes the document; `src/rastertop1102.c` validates the raster and maps grayscale into four exposure levels. Unmodified **foo2zjs/JBIG-KIT** code encodes ZjStream, and the system USB backend sends it to the printer. The installed filter links only to system `libcups` and `libSystem`. See the [tone measurement method (Czech)](tests/TONE_REFERENCE.md) and [upstream provenance](vendor/UPSTREAM.txt).
 
@@ -94,4 +96,4 @@ This removes the native queue and its driver files and utility only. If it was y
 
 This is a community project, not an HP or Apple product. No proprietary HP driver executable or printer firmware is distributed. See [release history](CHANGELOG.md).
 
-Licence inventory, source-delivery checks, trademark use and the limits of this review are recorded in [LEGAL.md](LEGAL.md). See [NOTICE](NOTICE) for attribution and distribution notices. No guarantee of freedom from legal claims is made.
+See [LEGAL.md](LEGAL.md) for licences, [Czech/EU analysis](LEGAL-ANALYSIS.cs.md) and [NOTICE](NOTICE) for attribution. Publication is free, without contracted support or warranty to the extent permitted by law. Recipients retain GPL rights; third-party rights are not waived. No guarantee of freedom from legal claims is made.

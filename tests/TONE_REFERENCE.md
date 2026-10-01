@@ -2,6 +2,8 @@
 
 Referenční data byla získána 1. října 2026 z lokálně nainstalovaného ovladače HP LaserJet Professional P1100 verze 6.9. Použit byl jeho režim FastRes 600, A6, běžný papír, hustota 3 a vypnutý EconoMode. Žádný program, kód ani tabulka extrahovaná z programu HP není součástí tohoto projektu. Referencí je naměřená odezva výstupu na vlastních kontrolních plochách, nikoli rozbor programu HP.
 
+Vlastník projektu dne 1. října 2026 potvrdil, že referenční ovladač získal z oficiálního zdroje. Toto potvrzení není nezávislým ověřením konkrétního instalačního balíku nebo jeho tehdejších smluvních podmínek; přesná adresa stažení a kopie těchto podmínek zde nejsou doloženy.
+
 `raster_fixture 8 0 ramp` vytvoří jednu stránku CUPS raster s 256 plochami o rozměru 128 × 128 pixelů. Jsou v mřížce 16 × 16 s počátkem (100, 100). Hodnoty vstupního množství černé rostou po řádcích od 0 do 255. Barevný prostor W používá opačnou číselnou polaritu. Rozlišení rastru je 600 × 600 dpi; hodnota cupsCompression 401 odpovídá referenční volbě HP.
 
 Tentýž raster se zpracoval lokálním filtrem HP do souboru, bez odeslání na tiskárnu. Filtr dostal data na standardním vstupu a uzavřený zpětný kanál přes `/dev/null`. Výstup se rozbalil nástrojem zjsdecode z přiložených zdrojů foo2zjs. Při měření byl oddělen úvodní PJL text od ZjStream.

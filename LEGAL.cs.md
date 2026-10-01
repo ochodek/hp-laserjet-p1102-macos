@@ -4,6 +4,8 @@
 
 ## Co zveřejňujeme
 
+Nové opravy 1.7.1 jsou dosud nevydané. Podrobnou aktuální aplikaci českého a evropského práva, potvrzené okolnosti a otevřené otázky najdete v [právním rozboru](LEGAL-ANALYSIS.cs.md).
+
 | Součást | Původ a licence |
 | --- | --- |
 | Nativní filtr, aplikace, komunikace USB, PDF, skripty a PPD | Kód projektu pod GPL-2.0-or-later. Použití AI je přiznané; neprohlašujeme výhradní lidské autorství výstupů AI. |
@@ -17,13 +19,15 @@ Soubor `zjs.h` nemá samostatnou licenční hlavičku a obsahuje poznámku půvo
 
 ## Splnění distribučních podmínek GPL
 
+Hlavička `jbig_ar.h` také nemá vlastní úplný licenční grant. Je posuzována v kontextu upstream GPL/JBIG-KIT, ne na základě domyšleného oznámení.
+
 Instalátor obsahuje úplnou licenci, oznámení a odpovídající `Source.tar.gz`, včetně závislostí a skriptů sestavení a instalace. U vydání je stejný archiv také samostatně. Test balíčku ověřuje úplnost zdrojů proti veřejným souborům projektu. Jde o postup s přiloženými zdroji podle GPLv2, článku 3(a). Nepřidáváme zákaz komerčního použití, NDA ani další EULA. Viz [GPLv2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
 
 Další vydání musí zachovat licence a autory, označit úpravy převzatých souborů a přiložit zdroje odpovídající skutečnému programu. Pouhý odkaz na GitHub není zde používaný způsob dodání zdrojů. Stažený zdrojový archiv vydání 1.6 obsahuje všechny soubory z odpovídajícího Git tagu, včetně oznámení a skriptů; jeho zveřejněné soubory se skrytě nenahrazují.
 
 ## Název a kompatibilita
 
-Název projektu je **P1102 Native**. HP LaserJet označuje podporovanou tiskárnu. Historické identifikátory fronty, souborů a adresa repozitáře zůstávají kvůli aktualizacím a dohledatelnosti, ne jako tvrzení, že jde o výrobek HP. Nepoužíváme loga výrobců ani převzaté reklamní obrázky. Nezávislost uvádí README, instalátor i aplikace. [Pravidla HP pro ochranné známky](https://www.hp.com/us-en/terms-of-use.html) upozorňují na záměnu původu a schválení výrobku; tato stránka nám licenci k ochranné známce neuděluje.
+Název projektu je **P1102 Native**. HP LaserJet označuje podporovanou tiskárnu. Historické identifikátory fronty, souborů a adresa repozitáře zůstávají kvůli aktualizacím a dohledatelnosti, ne jako tvrzení, že jde o výrobek HP. Nepoužíváme loga výrobců ani převzaté reklamní obrázky. Nezávislost uvádí README, instalátor i aplikace. [Pravidla HP pro ochranné známky](https://www.hp.com/us-en/terms-of-use.html) upozorňují na záměnu původu a schválení výrobku; tato stránka nám licenci k ochranné známce neuděluje. [Pravidla Apple pro třetí strany](https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html) vyžadují, aby odkaz na kompatibilitu nebyl výraznější než název nezávislého produktu a nevyvolával dojem schválení výrobcem. NOTICE připisuje ochranné známky společnosti Apple Inc.
 
 Podkladem implementace jsou otevřené zdroje, popisy protokolu, odpovědi tiskárny a pozorované chování místního ovladače. Směrnice 2009/24/ES upravuje pozorování a testování oprávněným uživatelem a zvlášť výjimky pro interoperabilitu. **To samo nepotvrzuje oprávněnost každého možného postupu, převzatého prvku nebo smluvní situace.** Projekt neobsahuje obcházení ochran, extrakci firmwaru ani distribuci proprietárních programů. Viz [směrnice](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32009L0024).
 

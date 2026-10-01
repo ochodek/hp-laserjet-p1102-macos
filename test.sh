@@ -17,3 +17,4 @@ xcrun clang -arch arm64 -fobjc-arc -Wall -Wextra -Werror -DP1102_PDF_OUTPUT_LIMI
 build/pdf-limit-tests
 python3 tests/test_installer.py
 python3 tests/test_uninstall.py
+python3 tests/test_build.py

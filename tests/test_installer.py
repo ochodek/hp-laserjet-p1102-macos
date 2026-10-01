@@ -11,7 +11,7 @@ URI = 'usb://Hewlett-Packard/HP%20LaserJet%20Professional%20P1102?serial=TEST'
 
 
 class InstallerTests(unittest.TestCase):
-    def install(self, current=None, devices='', discovery_error=False, phase='postinstall', arm64=True, symlink=False, app_id=None):
+    def install(self, current=None, devices='', discovery_error=False, phase='postinstall', arm64=True, symlink=False, app_id=None, path=None):
         with tempfile.TemporaryDirectory() as directory:
             folder = Path(directory)
             scripts = {p.name:p.read_text() for p in (ROOT/'scripts').iterdir() if p.is_file()}
@@ -40,7 +40,8 @@ class InstallerTests(unittest.TestCase):
             log = folder/'calls.jsonl'
             result = subprocess.run(['/bin/sh', str(fixture)], capture_output=True, text=True,
                 env={**os.environ, 'CURRENT_QUEUE': current or '', 'DEVICES': devices,
-                     'DISCOVERY_ERROR': str(int(discovery_error)), 'ARM64':str(int(arm64)), 'CALL_LOG': str(log)})
+                     'DISCOVERY_ERROR': str(int(discovery_error)), 'ARM64':str(int(arm64)), 'CALL_LOG': str(log),
+                     **({'PATH': path} if path is not None else {})})
             changes = [json.loads(line) for line in log.read_text().splitlines() if json.loads(line)[0]=='lpadmin']
             return result, changes
 
@@ -93,6 +94,22 @@ class InstallerTests(unittest.TestCase):
         result, changes = self.install(phase='preinstall',current='device for HP_LaserJet_P1102_Native: ipp://example.invalid/other')
         self.assertNotEqual(result.returncode,0)
         self.assertEqual(changes,[])
+
+    def test_preflight_uses_the_system_path_resolver_before_privileged_work(self):
+        with tempfile.TemporaryDirectory() as directory:
+            attacker = Path(directory)
+            (attacker/'dirname').write_text('#!/bin/sh\nprintf \'%s\\n\' "' + str(attacker) + '"\n')
+            (attacker/'dirname').chmod(0o755)
+            (attacker/'check-queue').write_text('#!/bin/sh\nexit 0\n')
+            (attacker/'check-queue').chmod(0o755)
+            result, changes = self.install(
+                phase='preinstall',
+                current='device for HP_LaserJet_P1102_Native: ipp://example.invalid/other',
+                path=str(attacker),
+            )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('queue name is used', result.stderr)
+        self.assertEqual(changes, [])
 
     def test_preflight_preserves_an_unrelated_application_with_the_same_name(self):
         result,changes=self.install(phase='preinstall',app_id='org.example.unrelated')

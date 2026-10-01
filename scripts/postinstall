@@ -5,7 +5,7 @@ LC_ALL=C
 export LC_ALL
 queue=HP_LaserJet_P1102_Native
 ppd=/Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd
-. "$(dirname "$0")/check-queue"
+. "$(/usr/bin/dirname "$0")/check-queue"
 if /usr/bin/lpstat -v "$queue" >/dev/null 2>&1; then
     /usr/sbin/lpadmin -p "$queue" -P "$ppd"
     exit 0

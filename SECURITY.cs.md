@@ -2,6 +2,8 @@
 
 [English](SECURITY.md) | **Česky**
 
+Nové opravy ve zdrojové větvi 1.7.1 a výsledky kontrol popisuje [audit](AUDIT-2026-10-01.md). Vydání 1.7 zůstává nezměněné; syntetické testy nenahrazují fyzické ani formální právní ověření.
+
 Jde o vibe-coded projekt vyvíjený s pomocí AI. Interní kontrola kódu a bezpečnosti proběhla 1. října 2026. Nálezy, opravy, důkazy a zbývající podmínky vydání jsou v [REVIEW.md](REVIEW.md). Nejde o nezávislý audit ani záruku nalezení všech chyb.
 
 ## Běh a oprávnění

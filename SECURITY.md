@@ -2,6 +2,8 @@
 
 **English** | [Česky](SECURITY.cs.md)
 
+The [2026-10-01 audit](AUDIT-2026-10-01.md) records new source-branch 1.7.1 fixes and executed checks. Published 1.7 is unchanged; synthetic tests are not physical verification or formal legal clearance.
+
 This vibe-coded project was developed with AI assistance. An internal code and security review was performed on 1 October 2026; findings, fixes, evidence and coverage limits are in [REVIEW.md](REVIEW.md). It is not an independent audit or a guarantee that every defect has been found.
 
 ## Runtime and permissions

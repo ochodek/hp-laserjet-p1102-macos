@@ -4,6 +4,8 @@
 
 ## Distribution inventory
 
+Source-branch fixes are 1.7.1, unreleased. See the [detailed Czech/EU legal analysis](LEGAL-ANALYSIS.cs.md) for confirmed facts, current legislation and unresolved publication questions. `jbig_ar.h`, like `zjs.h`, does not contain a standalone full licence grant; it is assessed in the upstream GPL/JBIG-KIT context, not by inventing a per-file notice.
+
 | Material | Origin and treatment |
 | --- | --- |
 | Native adapter, utility, USB/PDF code, scripts and PPD | Project code published under GPL-2.0-or-later; AI-assisted development disclosed. Project notices do not assert exclusive human authorship of AI output. |
@@ -23,7 +25,7 @@ Future releases must retain these materials, preserve third-party notices, ident
 
 ## HP compatibility and naming
 
-The project name is **P1102 Native**. References to HP LaserJet identify the supported printer. Historical queue identifiers, filenames and repository URLs remain for upgrade compatibility and discoverability; they are not a claim to be an HP product. No HP or Apple logos or copied marketing artwork are used. README, installer and utility identify the independent project. HP's [trademark guidance](https://www.hp.com/us-en/terms-of-use.html) cautions against confusing origin or endorsement; that page does not give this project a trademark licence.
+The project name is **P1102 Native**. References to HP LaserJet identify the supported printer. Historical queue identifiers, filenames and repository URLs remain for upgrade compatibility and discoverability; they are not a claim to be an HP product. No HP or Apple logos or copied marketing artwork are used. README, installer and utility identify the independent project. HP's [trademark guidance](https://www.hp.com/us-en/terms-of-use.html) cautions against confusing origin or endorsement; that page does not give this project a trademark licence. Apple's [third-party trademark guidelines](https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html) require compatibility references to remain subordinate to the independent product name and not imply endorsement. NOTICE attributes Apple's marks to Apple Inc.
 
 The implementation uses documented/open-source protocol information, printer responses and observed behaviour of a locally installed driver. EU Directive 2009/24/EC addresses observation/testing by a person entitled to use the program and, separately, conditional interoperability exceptions. This is relevant context, **not a finding that every possible use, copied element, licence agreement or jurisdiction is covered**. No circumvention, firmware extraction or proprietary binary redistribution is part of this project. See the [Directive](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32009L0024).
 

@@ -19,4 +19,4 @@ if [ -e "$app" ]; then
         exit 1
     fi
 fi
-exec /bin/sh "$(dirname "$0")/check-queue"
+exec /bin/sh "$(/usr/bin/dirname "$0")/check-queue"

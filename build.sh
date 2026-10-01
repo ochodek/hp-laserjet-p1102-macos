@@ -31,6 +31,9 @@ mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp LICENSE NOTICE "$app/Contents/Resources/"
 cp installer/utility/Info.plist "$app/Contents/Info.plist"
 xcrun clang -arch arm64 -mmacosx-version-min=11.0 -O2 -fobjc-arc \
+    -Wall -Wextra -Werror tools/render-app-icon.m -framework Cocoa -o build/render-app-icon
+build/render-app-icon "$app/Contents/Resources/P1102Utility.icns"
+xcrun clang -arch arm64 -mmacosx-version-min=11.0 -O2 -fobjc-arc \
     -Wall -Wextra -Werror src/device.m src/pdf-tools.m src/utility.m build/usb.o \
     -framework Cocoa -framework PDFKit -framework IOKit -framework ApplicationServices -o "$app/Contents/MacOS/P1102Utility"
 codesign --force --sign - "$app"

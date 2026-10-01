@@ -12,6 +12,8 @@ Projekt vznikl po aktualizaci macOS, kdy původní tisková fronta HP hlásila *
 
 ## Verze 1.7
 
+Veřejné vydání zůstává 1.7. Tato větev připravuje **1.7.1, dosud nevydáno**. [Audit](AUDIT-2026-10-01.md) uvádí opravy, výsledky kontrol i otevřené podmínky. Nový balíček nebyl při tomto auditu nainstalován ani fyzicky vyzkoušen.
+
 Nativní nástroj pro toner a stav tiskárny, volby papíru a kvality, tichý režim, časovače a PDF nástroje pro brožury, vodoznaky a ruční duplex. [Přehled funkcí](FEATURES.cs.md) a [zpráva z kontroly kódu](REVIEW.md) uvádějí ověřené chování i jeho meze. Instalátor obsahuje české a anglické pokyny, licenci GPL, kontroly aktualizace a odinstalaci.
 
 ## Instalace
@@ -78,7 +80,7 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Třináct rastrových/protokolových testů a sady pro USB/XML, PDF, instalaci a odinstalaci ověřují dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
+`./build.sh` sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty v `dist/`. Rastrové/protokolové testy a sady USB/XML, PDF a instalace/odinstalace ověřují obraz, kopie, odstíny, geometrii a neplatné vstupy. Archiv lze stejně sestavit bez `.git`; inventář určuje `SOURCE_MANIFEST`. Kontroly paměti a analýzu popisuje [SECURITY.cs.md](SECURITY.cs.md).
 
 macOS vykreslí dokument do rastru; `src/rastertop1102.c` ověří jeho parametry a převede odstíny na čtyři úrovně tiskového bodu. Nezměněný kód **foo2zjs/JBIG-KIT** vytvoří ZjStream a systémový USB backend jej odešle do tiskárny. Instalovaný filtr se váže pouze na systémové `libcups` a `libSystem`. Viz [metoda měření odstínů](tests/TONE_REFERENCE.md) a [původ závislostí](vendor/UPSTREAM.txt).
 
@@ -94,4 +96,4 @@ Skript odstraní pouze nativní frontu, její soubory a obslužnou aplikaci. Pok
 
 Jde o komunitní projekt, nikoli produkt HP nebo Apple. Neobsahuje proprietární program ovladače HP ani firmware tiskárny. Viz [přehled vydání](CHANGELOG.md).
 
-Soupis licencí, dodání zdrojů, použití ochranných známek a meze kontroly najdete v [LEGAL.cs.md](LEGAL.cs.md). Autory a distribuční oznámení uvádí [NOTICE](NOTICE). Projekt nezaručuje vyloučení právních nároků.
+Soupis licencí najdete v [LEGAL.cs.md](LEGAL.cs.md), českou a evropskou analýzu v [právním rozboru](LEGAL-ANALYSIS.cs.md). Autory uvádí [NOTICE](NOTICE). Projekt je zdarma, bez sjednané podpory a bez záruky v rozsahu dovoleném právem. Příjemci mají práva podle GPL, nejde o vzdání se práv převzatých autorů. Zveřejnění ani rešerše nezaručuje vyloučení právních nároků.
