@@ -1,6 +1,10 @@
 # Changelog / Přehled vydání
 
-## 1.7-rc1, 2026-10-01 (driver version 1.7)
+## 1.7, 2026-10-01 (driver version 1.7)
+
+Stable release following 1.7-rc1. Adds an English/Czech guided installer, upgrade and removal safeguards, cropped-PDF correctness, a hard serialized-PDF output limit and expanded package/installer tests. The final review corrected the economy-mode validation: EconoMode with density 1 can lose the lightest gray detail.
+
+Stabilní vydání po 1.7-rc1 přidává český a anglický instalátor, ochrany při aktualizaci a odinstalaci, správný výřez PDF a limit celého výstupu. Úsporný režim se sytostí 1 může ztratit nejsvětlejší šedé detaily.
 
 Native USB toner/status utility and CUPS ReportLevels; additional media, paper sizes, custom sizes, FastRes quality, EconoMode, density and jam recovery. Native power/quiet controls, internal-page commands, privacy-limited diagnostics, PDF watermark/booklet and manual duplex. Default print data retain 1.6 calibration. Physical validation and remaining coverage limits are tracked in [REVIEW.md](REVIEW.md).
 

@@ -21,3 +21,7 @@ xcrun clang -arch arm64 -O1 -g -fobjc-arc -fsanitize=address,undefined \
     -fno-omit-frame-pointer src/pdf-tools.m tests/pdf_tests.m -framework Cocoa -framework PDFKit \
     -o build/sanitized/pdf-tests
 UBSAN_OPTIONS=halt_on_error=1 ASAN_OPTIONS=detect_leaks=0 build/sanitized/pdf-tests
+xcrun clang -arch arm64 -O1 -g -fobjc-arc -fsanitize=address,undefined \
+    -fno-omit-frame-pointer -DP1102_PDF_OUTPUT_LIMIT=4096 src/pdf-tools.m tests/pdf_limit_tests.m \
+    -framework Cocoa -framework PDFKit -o build/sanitized/pdf-limit-tests
+UBSAN_OPTIONS=halt_on_error=1 ASAN_OPTIONS=detect_leaks=0 build/sanitized/pdf-limit-tests

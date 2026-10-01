@@ -1,6 +1,17 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 #import "pdf-tools.h"
 #include <math.h>
+#ifndef P1102_PDF_OUTPUT_LIMIT
+#define P1102_PDF_OUTPUT_LIMIT (256u * 1024u * 1024u)
+#endif
+typedef struct { CFMutableDataRef data; BOOL exceeded; } PDFOutput;
+static size_t appendPDFBytes(void *info, const void *bytes, size_t count)
+{
+    PDFOutput *out=info;
+    size_t length=(size_t)CFDataGetLength(out->data);
+    if (out->exceeded || count > P1102_PDF_OUTPUT_LIMIT - length) { out->exceeded=YES; return 0; }
+    CFDataAppendBytes(out->data,bytes,(CFIndex)count); return count;
+}
 static void pdfError(NSError **error, NSString *text)
 { if (error) *error = [NSError errorWithDomain:@"P1102 PDF" code:1 userInfo:@{NSLocalizedDescriptionKey:text}]; }
 static BOOL validRect(CGRect r)
@@ -9,17 +20,17 @@ static BOOL draw(PDFDocument *doc, NSInteger index, CGRect area, CGContextRef co
 {
     if (index < 0 || index >= (NSInteger)doc.pageCount) return YES;
     PDFPage *page = [doc pageAtIndex:(NSUInteger)index];
-    CGRect box = [page boundsForBox:kPDFDisplayBoxMediaBox];
+    CGRect box = [page boundsForBox:kPDFDisplayBoxCropBox];
     if (!validRect(box)) { pdfError(error, @"PDF page has invalid dimensions."); return NO; }
     CGContextSaveGState(context);
     CGContextClipToRect(context, area);
-    CGRect rotated = CGRectApplyAffineTransform(box, [page transformForBox:kPDFDisplayBoxMediaBox]);
+    CGRect rotated = CGRectApplyAffineTransform(box, [page transformForBox:kPDFDisplayBoxCropBox]);
     if (!validRect(rotated)) { CGContextRestoreGState(context); pdfError(error, @"Invalid rotated PDF bounds."); return NO; }
     CGFloat scale = MIN(area.size.width / rotated.size.width, area.size.height / rotated.size.height);
     CGContextTranslateCTM(context, area.origin.x + (area.size.width - rotated.size.width * scale) / 2 - rotated.origin.x * scale,
         area.origin.y + (area.size.height - rotated.size.height * scale) / 2 - rotated.origin.y * scale);
     CGContextScaleCTM(context, scale, scale);
-    [page drawWithBox:kPDFDisplayBoxMediaBox toContext:context];
+    [page drawWithBox:kPDFDisplayBoxCropBox toContext:context];
     CGContextRestoreGState(context); return YES;
 }
 PDFDocument *P1102PreparePDF(PDFDocument *input, NSInteger booklet, NSString *watermark, BOOL firstOnly, NSError **error)
@@ -27,7 +38,10 @@ PDFDocument *P1102PreparePDF(PDFDocument *input, NSInteger booklet, NSString *wa
     if (!input || input.isLocked || !input.allowsPrinting || !input.pageCount || input.pageCount > 2000 || booklet < 0 || booklet > 2 || watermark.length > 120) {
         pdfError(error, @"Open a printable PDF with 1-2000 pages; watermark limit is 120 characters."); return nil;
     }
-    NSMutableData *data = [NSMutableData data]; CGDataConsumerRef consumer = CGDataConsumerCreateWithCFData((__bridge CFMutableDataRef)data);
+    NSMutableData *data = [NSMutableData data];
+    PDFOutput output={(__bridge CFMutableDataRef)data,NO};
+    CGDataConsumerCallbacks callbacks={appendPDFBytes,NULL};
+    CGDataConsumerRef consumer = CGDataConsumerCreate(&output,&callbacks);
     if (!consumer) { pdfError(error, @"Cannot allocate PDF output."); return nil; }
     CGContextRef context = CGPDFContextCreate(consumer, NULL, NULL); CGDataConsumerRelease(consumer);
     if (!context) { pdfError(error, @"Cannot create PDF output."); return nil; }
@@ -35,7 +49,7 @@ PDFDocument *P1102PreparePDF(PDFDocument *input, NSInteger booklet, NSString *wa
     BOOL ok = YES; NSError *pageError = nil;
     for (NSUInteger i = 0; i < count && ok; i++) {
         @autoreleasepool {
-            CGRect paper = booklet ? CGRectMake(0, 0, 842, 595) : [[input pageAtIndex:i] boundsForBox:kPDFDisplayBoxMediaBox];
+            CGRect paper = booklet ? CGRectMake(0, 0, 842, 595) : [[input pageAtIndex:i] boundsForBox:kPDFDisplayBoxCropBox];
             if (!validRect(paper)) { pdfError(&pageError, @"Invalid PDF page dimensions."); ok = NO; break; }
             /* Normalize the page origin and preserve landscape rotations. */
             if (!booklet && labs([input pageAtIndex:i].rotation) % 180 == 90) paper.size = CGSizeMake(paper.size.height, paper.size.width);
@@ -64,10 +78,11 @@ PDFDocument *P1102PreparePDF(PDFDocument *input, NSInteger booklet, NSString *wa
                 [NSGraphicsContext restoreGraphicsState]; CGContextRestoreGState(context);
             }
             CGPDFContextEndPage(context);
-            if (data.length > 256 * 1024 * 1024) { pdfError(&pageError, @"Prepared PDF exceeds 256 MB."); ok = NO; }
+            if (output.exceeded) { pdfError(&pageError, @"Prepared PDF exceeds the output size limit."); ok = NO; }
         }
     }
     CGPDFContextClose(context); CGContextRelease(context);
+    if (output.exceeded) { pdfError(&pageError, @"Prepared PDF exceeds the output size limit."); ok = NO; }
     if (!ok) { if (error) *error = pageError; return nil; }
     PDFDocument *result = [[PDFDocument alloc] initWithData:data];
     if (!result) pdfError(error, @"Cannot reopen prepared PDF.");
@@ -86,7 +101,8 @@ PDFDocument *P1102PDFPass(PDFDocument *input, BOOL backs, BOOL shortEdge, NSErro
         if (i < input.pageCount) page = [[input pageAtIndex:i] copy];
         else {
             page = [PDFPage new];
-            [page setBounds:[[input pageAtIndex:input.pageCount - 1] boundsForBox:kPDFDisplayBoxMediaBox] forBox:kPDFDisplayBoxMediaBox];
+            [page setBounds:[[input pageAtIndex:input.pageCount - 1] boundsForBox:kPDFDisplayBoxCropBox] forBox:kPDFDisplayBoxMediaBox];
+            page.rotation=[input pageAtIndex:input.pageCount - 1].rotation;
         }
         if (backs && !shortEdge) page.rotation = (page.rotation + 180) % 360;
         [result insertPage:page atIndex:result.pageCount];

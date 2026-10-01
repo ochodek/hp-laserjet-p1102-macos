@@ -2,7 +2,7 @@
 
 [English](FEATURES.md)
 
-Verze 1.7 je ve fázi ověřování. Jde o porovnání funkcí, nikoli certifikaci HP nebo příslib totožného chování u všech dokumentů. Cílem zůstává P1102 přes USB, nikoli P1102w či jiné modely.
+Verze 1.7. Jde o porovnání funkcí, nikoli certifikaci HP nebo příslib totožného chování u všech dokumentů. Cílem zůstává P1102 přes USB, nikoli P1102w či jiné modely.
 
 ## Tisk
 
@@ -24,6 +24,8 @@ Verze 1.7 je ve fázi ověřování. Jde o porovnání funkcí, nikoli certifika
 
 Nástroje PDF přijímají odemčené dokumenty s povoleným tiskem do 200 MB a 2 000 stran. Vytvářejí samostatné zploštělé PDF, zdrojový soubor nemění. Tisknutelné anotace zůstávají ve vzhledu zachovány, interaktivita formulářů, odkazy a platnost digitálních podpisů se do upravené kopie nepřenášejí. Důležité dokumenty vždy zkontroluj v náhledu. Ruční duplex vynucuje jednu kopii a jednu výstupní stranu na list; brožura už má stránky rozložené v připraveném PDF.
 
+EconoMode se sytostí 1 při fyzické zkoušce ztratil nejsvětlejší šedé pole. Jde o režim pro koncepty; pro jemnou grafiku použijte běžný tisk. PDF nástroje zachovávají viditelný výřez CropBox a otočení stránky. Výstup má limit 256 MiB včetně dokončení souboru. Ořez není začernění: oříznutý obsah může v PDF zůstat.
+
 ## P1102 Utility
 
 Otevři **Aplikace, P1102 Utility**, případně tlačítko nástroje tiskárny, pokud ho macOS nabízí. Rozhraní sleduje jazyk Macu, češtinu nebo angličtinu. Obnovení čte tiskárnu přímo přes USB. Při chybě zobrazí nedostupné údaje, nikoli stará procenta. Aplikace nemá trvale běžící službu, telemetrii ani internetové připojení.
@@ -31,7 +33,7 @@ Otevři **Aplikace, P1102 Utility**, případně tlačítko nástroje tiskárny,
 * Živý odhad zbývajícího černého toneru, model a stav kazety, čas úspěšného načtení.
 * Celkový počet stran, strany s aktuální kazetou, odhad zbývajících stran, počty zaseknutí a chyb podání, kódy událostí, datum firmwaru a nastavený papír v zásobníku.
 * Uspávání, automatické vypnutí a tichý režim; každou změnu potvrzuje zpětné přečtení. Samotné čtení stavu nastavení nemění.
-* Příkazy pro konfigurační stránku, stav spotřebního materiálu, ukázku a čištění. Spouštějí se výslovným tlačítkem. Čištění vyžaduje vhodný kancelářský papír a trvá několik minut. Uživatel fyzicky potvrdil stránku spotřebního materiálu s údajem 60 % toneru; konfigurační, ukázková a čisticí stránka zatím ověřené nejsou.
+* Příkazy pro konfigurační stránku, stav spotřebního materiálu, ukázku a čištění. Spouštějí se výslovným tlačítkem. Čištění vyžaduje vhodný kancelářský papír a trvá několik minut. Uživatel fyzicky potvrdil stránku spotřebního materiálu s údajem 60 % toneru; uživatel následně potvrdil také konfigurační, ukázkovou a čisticí stránku bez chyb.
 * Export diagnostiky do JSON z pevně vybraných polí, bez sériových čísel, uživatelských jmen, cest a obsahu dokumentů.
 * Nativní příkazový nástroj `/Library/Printers/P1102Native/p1102ctl`: `status`, `supplies`, `set`, `page`. Výpis CLI obsahuje sériové číslo tiskárny, před sdílením ho odstraň. Při více připojených P1102 lze CLI zadat konkrétní sériové číslo USB; grafická aplikace nejednoznačný výběr odmítne.
 * Příkaz CUPS `ReportLevels` pro údaje o náplni v macOS. CUPS může držet starší hodnotu; čas v obslužné aplikaci ukazuje čerstvé čtení z USB. Instalovaná fronta na macOS 27.0.1 úspěšně spustila ReportLevels a zveřejnila čerstvou hodnotu. Ukazatel byl ověřen i přímo v Nastavení systému, Volby a spotřební materiál, Úrovně náplní.

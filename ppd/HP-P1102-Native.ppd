@@ -150,7 +150,7 @@
 *MediaType RoughPaper/Rough: "<</cupsMediaType 263>>setpagedevice"
 *MediaType VellumPaper/Vellum: "<</cupsMediaType 273>>setpagedevice"
 *CloseUI: *MediaType
-*OpenUI *EconoMode/Save Toner: Boolean
+*OpenUI *EconoMode/Save Toner (Draft, less detail): Boolean
 *OrderDependency: 20 AnySetup *EconoMode
 *DefaultEconoMode: False
 *EconoMode False/Off: ""
@@ -165,7 +165,7 @@
 *OpenUI *pjlDensity/Print Density: PickOne
 *OrderDependency: 20 AnySetup *pjlDensity
 *DefaultpjlDensity: 3
-*pjlDensity 1/1: ""
+*pjlDensity 1/1 (lightest): ""
 *pjlDensity 2/2: ""
 *pjlDensity 3/3: ""
 *pjlDensity 4/4: ""

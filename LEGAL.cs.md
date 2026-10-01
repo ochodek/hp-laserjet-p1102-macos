@@ -1,6 +1,6 @@
 # Kontrola licencí a zveřejnění
 
-[English](LEGAL.md). Kontrola kandidáta 1.7 ze dne 1. října 2026. Jde o kontrolu zdrojů a balíčku provedenou AI asistentem tohoto projektu, nikoli právní stanovisko nebo nezávislé prověření všech práv. Nezaručuje, že nikdo nevznese nárok. Projekt je nezávislý a veřejně dostupný komunitní software.
+[English](LEGAL.md). Kontrola verze 1.7 ze dne 1. října 2026. Jde o kontrolu zdrojů a balíčku provedenou AI asistentem tohoto projektu, nikoli právní stanovisko nebo nezávislé prověření všech práv. Nezaručuje, že nikdo nevznese nárok. Projekt je nezávislý a veřejně dostupný komunitní software.
 
 ## Co zveřejňujeme
 

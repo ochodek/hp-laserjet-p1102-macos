@@ -14,10 +14,36 @@ static PDFDocument *fixture(NSUInteger pages)
     }
     CGPDFContextClose(c);CGContextRelease(c);return [[PDFDocument alloc] initWithData:data];
 }
+static void cropped_pages_keep_the_visible_size_and_orientation(void)
+{
+    PDFDocument *input=fixture(1); PDFPage *page=[input pageAtIndex:0];
+    [page setBounds:CGRectMake(25,25,300,500) forBox:kPDFDisplayBoxCropBox];
+    for (NSNumber *rotation in @[@0,@90,@180,@270]) {
+        page.rotation=rotation.integerValue; NSError *error=nil;
+        PDFDocument *prepared=P1102PreparePDF(input,0,@"",NO,&error);
+        assert(prepared&&!error);
+        CGRect bounds=[[prepared pageAtIndex:0] boundsForBox:kPDFDisplayBoxMediaBox];
+        BOOL landscape=rotation.integerValue%180!=0;
+        assert(bounds.size.width==(landscape?500:300)&&bounds.size.height==(landscape?300:500));
+        NSImage *original=[page thumbnailOfSize:NSMakeSize(300,300) forBox:kPDFDisplayBoxCropBox];
+        NSImage *output=[[prepared pageAtIndex:0] thumbnailOfSize:NSMakeSize(300,300) forBox:kPDFDisplayBoxMediaBox];
+        NSBitmapImageRep *a=[NSBitmapImageRep imageRepWithData:original.TIFFRepresentation];
+        NSBitmapImageRep *b=[NSBitmapImageRep imageRepWithData:output.TIFFRepresentation];
+        assert(a.pixelsWide==b.pixelsWide&&a.pixelsHigh==b.pixelsHigh);
+        double difference=0;
+        for (NSInteger y=0;y<a.pixelsHigh;y++) for (NSInteger x=0;x<a.pixelsWide;x++) {
+            CGFloat av=[[[a colorAtX:x y:y] colorUsingColorSpace:NSColorSpace.genericGrayColorSpace] whiteComponent];
+            CGFloat bv=[[[b colorAtX:x y:y] colorUsingColorSpace:NSColorSpace.genericGrayColorSpace] whiteComponent];
+            difference+=fabs(av-bv);
+        }
+        assert(difference/(a.pixelsWide*a.pixelsHigh)<0.01);
+    }
+}
 int main(void)
 {
  @autoreleasepool {
     [NSApplication sharedApplication]; PDFDocument *input=fixture(5);NSError *error=nil;
+    cropped_pages_keep_the_visible_size_and_orientation();
     PDFDocument *book=P1102PreparePDF(input,1,@"",NO,&error); assert(book&&book.pageCount==4&&!error);
     assert([[book pageAtIndex:0].string containsString:@"PAGE1"]&&![[book pageAtIndex:0].string containsString:@"PAGE5"]);
     assert([[book pageAtIndex:1].string containsString:@"PAGE2"]);

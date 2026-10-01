@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="2">
-  <title>P1102 Native (for HP LaserJet P1102)</title>
-  <welcome file="Welcome.html"/>
+  <title>P1102 Native 1.7</title>
+  <welcome file="Welcome.html" mime-type="text/html"/>
+  <readme file="ReadMe.html" mime-type="text/html"/>
+  <license file="License.txt" mime-type="text/plain"/>
+  <conclusion file="Conclusion.html" mime-type="text/html"/>
   <options customize="never" hostArchitectures="arm64" rootVolumeOnly="true"/>
+  <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true"/>
   <allowed-os-versions><os-version min="11.0"/></allowed-os-versions>
   <choices-outline><line choice="driver"/></choices-outline>
   <choice id="driver" title="P1102 Native ARM64" visible="false">
     <pkg-ref id="cz.marek.p1102-native"/>
   </choice>
   <pkg-ref id="cz.marek.p1102-native" version="1.7" onConclusion="none">P1102-component.pkg</pkg-ref>
+  <pkg-ref id="cz.marek.p1102-native">
+    <must-close><app id="cz.marek.p1102-native.utility"/></must-close>
+  </pkg-ref>
 </installer-gui-script>

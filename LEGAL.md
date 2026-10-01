@@ -1,6 +1,6 @@
 # Licence and publication review
 
-[Česky](LEGAL.cs.md). Reviewed 1 October 2026 for the 1.7 candidate. This is a source and packaging compliance review by the project's AI coding agent, not a legal opinion or an independent rights clearance. It cannot guarantee that nobody will make a claim. The project is maintained as independent, publicly available community software.
+[Česky](LEGAL.cs.md). Reviewed 1 October 2026 for the 1.7. This is a source and packaging compliance review by the project's AI coding agent, not a legal opinion or an independent rights clearance. It cannot guarantee that nobody will make a claim. The project is maintained as independent, publicly available community software.
 
 ## Distribution inventory
 

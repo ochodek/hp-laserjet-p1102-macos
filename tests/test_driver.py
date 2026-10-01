@@ -64,6 +64,20 @@ class DriverTests(unittest.TestCase):
                 self.assertIn(f'@PJL SET ECONOMODE={economy}'.encode(), result.stdout)
                 self.assertIn(f'@PJL SET JAMRECOVERY={recovery}'.encode(), result.stdout)
 
+    def test_economy_and_density_do_not_discard_gray_data_in_the_filter(self):
+        raster = subprocess.check_output([str(ROOT / 'build/raster_fixture'), '8', '0', 'ramp'])
+        images = []
+        for options in ['', 'EconoMode pjlDensity=1']:
+            result = run_filter(raster, options)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            with tempfile.TemporaryDirectory() as d:
+                path = Path(d) / 'job.zjs'
+                path.write_bytes(result.stdout)
+                subprocess.run([str(ROOT/'build/zjsdecode'), '-d', str(Path(d)/'page'), str(path)],
+                               check=True, stdout=subprocess.DEVNULL)
+                images.append(read_image(next(Path(d).glob('page-*.pgm'))))
+        self.assertEqual(images[0], images[1])
+
     def test_supported_media_and_quality_match_hp_protocol_codes(self):
         media = [1,2,258,282,262,283,265,513,267,514,515,512,260,516,263,273]
         papers = [(595,842,9),(420,595,11),(297,420,70),(612,792,1),(612,1008,5),

@@ -10,19 +10,19 @@ The project started after a macOS upgrade left the legacy HP queue reporting **â
 
 **[Download the installer](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest)** | [Installation](#installation) | [Compatibility](#compatibility-and-validation) | [Report a problem](https://github.com/ochodek/hp-laserjet-p1102-macos/issues)
 
-## Development version 1.7
+## Version 1.7
 
-This branch adds a native toner/status utility, paper and quality options, quiet/power settings, and PDF booklet, watermark and manual-duplex workflows. See the [feature comparison](FEATURES.md) and [review findings](REVIEW.md). It is a validation candidate, not yet a fully tested replacement for every HP workflow. Published 1.6 remains the stable baseline described below. The [1.7 test release](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/tag/v1.7-rc1) includes `HP-P1102-Native-1.7.pkg`, matching source and checksums. Install it using the same steps below; the installed model reports version 1.7.
+Native toner/status utility, paper and quality options, quiet/power settings, PDF booklets, watermarks and manual duplex. See the [feature comparison](FEATURES.md) and [review findings](REVIEW.md) for verified behavior and limits. The installer includes English/Czech guidance, GPL licence, upgrade checks and an explicit uninstaller.
 
 ## Installation
 
-1. Open [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) and download `HP-P1102-Native-1.6.pkg`. No compilation is needed.
+1. Open [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) and download `HP-P1102-Native-1.7.pkg`. No compilation is needed.
 2. Connect the powered-on P1102 by USB, directly or through a working adapter. Load A4 paper.
 3. Open the package and complete installation. macOS requires administrator authorization.
 4. Select **HP LaserJet P1102 Native** in the application's print dialog. Set it as your default in **System Settings, Printers & Scanners** if desired.
 5. Print one page to check your printer's output.
 
-The installer creates its own queue when it finds the connected P1102. If the printer was disconnected during installation, add it in **Printers & Scanners**, choose **Use: Select Software**, and select **HP LaserJet P1102 Native ARM64, 1.6**. Re-running the installer with the printer connected is another option. Updates refresh only this driver's queue and resolution. The original HP queue and default printer selection are preserved.
+Quit P1102 Utility and finish pending jobs before updating. The installer creates its own queue when it finds exactly one connected P1102. If the printer was disconnected during installation, add it in **Printers & Scanners**, choose **Use: Select Software**, and select **HP LaserJet P1102 Native ARM64, 1.7**. Re-running the installer with the printer connected is another option. Updates refresh this driver's PPD while retaining existing quality choices. A queue-name conflict with another printer stops installation; with multiple P1102 devices, choose the intended one manually. The original HP queue and default printer selection are preserved.
 
 ### macOS security prompts
 
@@ -49,11 +49,11 @@ Checksums detect changed downloads; they do not replace verifying the publisher.
 | macOS 28 | Untested; future compatibility is not guaranteed |
 | Intel Macs, P1102w, other HP models, Wi-Fi/AirPrint | Not validated or supported by this package |
 
-Supported output: monochrome, single-sided, 600 Ã— 600 dpi, A4/A5/A6/Letter/Legal, multiple pages and copies. A4 is the default. There is no toner monitor, HP utility, automatic updater, duplex implementation, firmware download, or firmware modification.
+Supported output includes FastRes 600/1200, media and density choices, multiple pages and copies, and manual duplex through P1102 Utility. A4, FastRes 600, EconoMode off and density 3 are the defaults. Toner is available in the utility and macOS Supply Levels. See [all features](FEATURES.md). There is no automatic duplex hardware, updater or firmware modification.
 
 The driver still depends on macOS providing CUPS filters, PPD support, the rasterizer, and the USB backend. Removing its Rosetta dependency does not make it independent of future macOS printing changes.
 
-Gray gradients were visually compared with HP driver 6.9 and accepted as matching. Digital tests compare all 256 tones and a complete separate reference image. Version 1.6 completed a one-page job through the installed filter; the final sheet's appearance has not yet received separate user confirmation.
+Gray gradients were visually compared with HP driver 6.9 and accepted as matching. Digital tests compare all 256 tones and a complete separate reference image. Physical 1.7 tests confirmed long-edge duplex, a watermarked booklet, FastRes 1200, toner reporting and internal configuration/demo/cleaning pages. EconoMode with density 1 lost the lightest nonwhite gray field; use it for drafts, not faint graphics or fine detail. The normal mode retained all nine nonwhite fields and all six test lines.
 
 Page placement is calibrated to the average of three A4 prints from one printer. Identical data produced measured center-position ranges of **0.81 mm horizontally and 0.63 mm vertically**. A fixed software correction cannot eliminate variation between sheets or measurement uncertainty. The printable area is intentionally conservative, and margins on another printer may differ.
 
@@ -78,19 +78,15 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` builds the filter, command helper, CLI and utility on this branch. `./package.sh` runs the tests and produces the installer, source archive, and checksums in `dist/`. Twelve raster/protocol contract tests plus device/PDF suites cover decoded image content, copies, tone response, geometry, and malformed input. Local sanitizer checks and analysis of the adapter are described in [SECURITY.md](SECURITY.md).
+`./build.sh` builds the filter, command helper, CLI and utility for this release. `./package.sh` runs the tests and produces the installer, source archive, and checksums in `dist/`. Thirteen raster/protocol contract tests plus device/PDF and installation/removal suites cover decoded image content, copies, tone response, geometry, and malformed input. Local sanitizer checks and analysis of the adapter are described in [SECURITY.md](SECURITY.md).
 
 macOS rasterizes the document; `src/rastertop1102.c` validates the raster and maps grayscale into four exposure levels. Unmodified **foo2zjs/JBIG-KIT** code encodes ZjStream, and the system USB backend sends it to the printer. The installed filter links only to system `libcups` and `libSystem`. See the [tone measurement method (Czech)](tests/TONE_REFERENCE.md) and [upstream provenance](vendor/UPSTREAM.txt).
 
 ## Uninstall
 
-Let pending jobs finish, then run from the source directory:
+Quit P1102 Utility and let pending jobs finish. In Finder, choose **Go, Go to Folder** and open `/Library/Printers/P1102Native`. Open `Uninstall.command`, type `REMOVE` when prompted and authorize locally. Alternatively, run `sudo ./uninstall.sh` from the matching source directory. The uninstaller refuses pending native jobs and a queue reassigned to another printer.
 
-```sh
-sudo ./uninstall.sh
-```
-
-This removes the native queue and its driver files only. If it was your default printer, select another one afterward. The original HP software and Rosetta are retained.
+This removes the native queue and its driver files and utility only. If it was your default printer, select another one afterward. The original HP software and Rosetta are retained.
 
 ## License and credits
 

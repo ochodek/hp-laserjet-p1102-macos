@@ -10,19 +10,19 @@ Projekt vznikl po aktualizaci macOS, kdy původní tisková fronta HP hlásila *
 
 **[Stáhnout instalátor](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest)** | [Instalace](#instalace) | [Kompatibilita](#kompatibilita-a-ověření) | [Nahlásit problém](https://github.com/ochodek/hp-laserjet-p1102-macos/issues)
 
-## Vývojová verze 1.7
+## Verze 1.7
 
-Tato větev přidává nativní nástroj pro toner a stav tiskárny, volby papíru a kvality, tichý režim, časovače a PDF nástroje pro brožury, vodoznaky a ruční duplex. Podrobnosti najdete v [přehledu funkcí](FEATURES.cs.md) a [zprávě z kontroly kódu](REVIEW.md). Jde o kandidáta k ověření, nikoli o plně prověřenou náhradu každého postupu HP. Publikovaná 1.6 zůstává stabilním základem popsaným níže. [Testovací vydání 1.7](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/tag/v1.7-rc1) obsahuje `HP-P1102-Native-1.7.pkg`, odpovídající zdroje a kontrolní součty. Instalace má stejný postup jako níže; model tiskárny pak uvádí verzi 1.7.
+Nativní nástroj pro toner a stav tiskárny, volby papíru a kvality, tichý režim, časovače a PDF nástroje pro brožury, vodoznaky a ruční duplex. [Přehled funkcí](FEATURES.cs.md) a [zpráva z kontroly kódu](REVIEW.md) uvádějí ověřené chování i jeho meze. Instalátor obsahuje české a anglické pokyny, licenci GPL, kontroly aktualizace a odinstalaci.
 
 ## Instalace
 
-1. V části [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) stáhněte `HP-P1102-Native-1.6.pkg`. Nic nemusíte kompilovat.
+1. V části [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) stáhněte `HP-P1102-Native-1.7.pkg`. Nic nemusíte kompilovat.
 2. Připojte zapnutou P1102 přes USB, případně funkční USB adaptér. Vložte papír A4.
 3. Otevřete balíček a dokončete instalaci. macOS vyžádá oprávnění správce.
 4. V tiskovém dialogu vyberte **HP LaserJet P1102 Native**. Pokud chcete, nastavte ji jako výchozí v **Nastavení systému, Tiskárny a skenery**.
 5. Ověřte výsledek tiskem jedné stránky.
 
-Instalátor vytvoří vlastní frontu, pokud najde připojenou P1102. Jestliže byla při instalaci odpojená, přidejte ji v **Tiskárnách a skenerech**, v nabídce **Použít: Vybrat software** zvolte **HP LaserJet P1102 Native ARM64, 1.6**. Případně znovu spusťte instalátor s připojenou tiskárnou. Aktualizace obnoví pouze frontu tohoto ovladače a její rozlišení. Původní fronta HP i volba výchozí tiskárny zůstávají zachované.
+Před aktualizací ukončete P1102 Utility a dokončete čekající úlohy. Instalátor vytvoří vlastní frontu, pokud najde právě jednu připojenou P1102. Jestliže byla při instalaci odpojená, přidejte ji v **Tiskárnách a skenerech**, v nabídce **Použít: Vybrat software** zvolte **HP LaserJet P1102 Native ARM64, 1.7**. Případně znovu spusťte instalátor s připojenou tiskárnou. Aktualizace obnoví PPD tohoto ovladače a zachová zvolené nastavení kvality. Pokud název fronty patří jiné tiskárně, instalace se zastaví. Při více připojených P1102 vyberte zamýšlenou tiskárnu ručně. Původní fronta HP i volba výchozí tiskárny zůstávají zachované.
 
 ### Bezpečnostní upozornění macOS
 
@@ -49,11 +49,11 @@ Kontrolní součty odhalí změněné soubory; nenahrazují ověření totožnos
 | macOS 28 | Neověřeno; budoucí kompatibilita není zaručená |
 | Intel Macy, P1102w, jiné modely HP, Wi-Fi/AirPrint | Tento balíček je neověřuje ani nepodporuje |
 
-Podporovaný výstup: černobílý jednostranný tisk, 600 × 600 dpi, A4/A5/A6/Letter/Legal, více stránek a kopie. Výchozí formát je A4. Ovladač neobsahuje sledování toneru, nástroje HP, automatický aktualizátor, duplex, stahování ani úpravy firmwaru.
+Podporovaný výstup zahrnuje FastRes 600/1200, volby médií a sytosti, více stránek a kopie i ruční duplex prostřednictvím P1102 Utility. Výchozí nastavení je A4, FastRes 600, vypnutý EconoMode a sytost 3. Stav toneru je dostupný v aplikaci i v Nastavení systému. Viz [všechny funkce](FEATURES.cs.md). Tiskárna nemá automatický duplex; software neobsahuje automatický aktualizátor ani úpravy firmwaru.
 
 Ovladač stále závisí na podpoře filtrů CUPS, PPD, vykreslování rastru a USB backendu v macOS. Odstranění závislosti na Rosettě samo o sobě nezaručuje funkčnost po budoucích změnách tiskového systému macOS.
 
-Šedé přechody byly vizuálně porovnány s ovladačem HP 6.9 a potvrzeny jako shodné. Datové testy porovnávají všech 256 odstínů a celý samostatný referenční obraz. Verze 1.6 dokončila jednostránkovou úlohu přes nainstalovaný filtr; vzhled posledního listu zatím nebyl samostatně potvrzen uživatelem.
+Šedé přechody byly vizuálně porovnány s ovladačem HP 6.9 a potvrzeny jako shodné. Datové testy porovnávají všech 256 odstínů a celý samostatný referenční obraz. Fyzické zkoušky 1.7 potvrdily ruční duplex s otáčením jako kniha, brožuru s vodoznakem, FastRes 1200, údaj o toneru i konfigurační, ukázkovou a čisticí stránku. Při EconoMode se sytostí 1 zmizelo nejsvětlejší ne bílé pole; tento režim používejte pro koncepty, nikoli jemnou grafiku. Běžný režim zachoval všech devět ne bílých polí a všech šest zkušebních čar.
 
 Poloha obrazu je kalibrovaná podle průměru tří stejných výtisků A4 na jedné tiskárně. Naměřená poloha středu se mezi listy lišila až o **0,81 mm vodorovně a 0,63 mm svisle**. Pevná softwarová korekce neodstraní kolísání mezi listy ani nejistotu měření. Tisknutelná plocha má záměrně větší rezervu; na jiném kusu tiskárny mohou být okraje odlišné.
 
@@ -78,19 +78,15 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` v této větvi sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Dvanáct rastrových/protokolových testů a sady pro USB/XML a PDF ověřují dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
+`./build.sh` sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Třináct rastrových/protokolových testů a sady pro USB/XML, PDF, instalaci a odinstalaci ověřují dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
 
 macOS vykreslí dokument do rastru; `src/rastertop1102.c` ověří jeho parametry a převede odstíny na čtyři úrovně tiskového bodu. Nezměněný kód **foo2zjs/JBIG-KIT** vytvoří ZjStream a systémový USB backend jej odešle do tiskárny. Instalovaný filtr se váže pouze na systémové `libcups` a `libSystem`. Viz [metoda měření odstínů](tests/TONE_REFERENCE.md) a [původ závislostí](vendor/UPSTREAM.txt).
 
 ## Odinstalace
 
-Nechte dokončit čekající úlohy a ze zdrojového adresáře spusťte:
+Ukončete P1102 Utility a nechte dokončit čekající úlohy. Ve Finderu zvolte **Otevřít, Otevřít složku** a zadejte `/Library/Printers/P1102Native`. Otevřete `Uninstall.command`, po výzvě napište `REMOVE` a potvrďte oprávnění přímo na Macu. Případně spusťte `sudo ./uninstall.sh` z odpovídajících zdrojů. Odinstalace odmítne pokračovat při čekajících nativních úlohách nebo pokud fronta mezitím patří jiné tiskárně.
 
-```sh
-sudo ./uninstall.sh
-```
-
-Skript odstraní pouze nativní frontu a její soubory. Pokud byla výchozí, následně vyberte jinou tiskárnu. Původní software HP a Rosetta zůstávají zachované.
+Skript odstraní pouze nativní frontu, její soubory a obslužnou aplikaci. Pokud byla výchozí, následně vyberte jinou tiskárnu. Původní software HP a Rosetta zůstávají zachované.
 
 ## Licence a poděkování
 

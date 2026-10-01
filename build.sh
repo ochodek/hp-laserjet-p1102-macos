@@ -26,6 +26,7 @@ for program in commandtop1102 device-cli; do
     codesign --force --sign - "build/$output"
 done
 app='build/P1102 Utility.app'
+/bin/rm -rf "$app"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
 cp LICENSE NOTICE "$app/Contents/Resources/"
 cp installer/utility/Info.plist "$app/Contents/Info.plist"
