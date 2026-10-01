@@ -10,6 +10,10 @@ The project started after a macOS upgrade left the legacy HP queue reporting **â
 
 **[Download the installer](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest)** | [Installation](#installation) | [Compatibility](#compatibility-and-validation) | [Report a problem](https://github.com/ochodek/hp-laserjet-p1102-macos/issues)
 
+## Development version 1.7
+
+This branch adds a native toner/status utility, paper and quality options, quiet/power settings, and PDF booklet, watermark and manual-duplex workflows. See the [feature comparison](FEATURES.md) and [review findings](REVIEW.md). It is a validation candidate, not yet a fully tested replacement for every HP workflow. Published 1.6 remains the stable baseline described below.
+
 ## Installation
 
 1. Open [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) and download `HP-P1102-Native-1.6.pkg`. No compilation is needed.
@@ -74,7 +78,7 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` builds only the filter. `./package.sh` runs the tests and produces the installer, source archive, and checksums in `dist/`. Eight contract tests cover decoded image content, copies, tone response, geometry, and malformed input. Local sanitizer checks and analysis of the adapter are described in [SECURITY.md](SECURITY.md).
+`./build.sh` builds the filter, command helper, CLI and utility on this branch. `./package.sh` runs the tests and produces the installer, source archive, and checksums in `dist/`. Ten raster/protocol contract tests plus device/PDF suites cover decoded image content, copies, tone response, geometry, and malformed input. Local sanitizer checks and analysis of the adapter are described in [SECURITY.md](SECURITY.md).
 
 macOS rasterizes the document; `src/rastertop1102.c` validates the raster and maps grayscale into four exposure levels. Unmodified **foo2zjs/JBIG-KIT** code encodes ZjStream, and the system USB backend sends it to the printer. The installed filter links only to system `libcups` and `libSystem`. See the [tone measurement method (Czech)](tests/TONE_REFERENCE.md) and [upstream provenance](vendor/UPSTREAM.txt).
 

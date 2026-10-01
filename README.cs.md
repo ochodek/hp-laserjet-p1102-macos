@@ -10,6 +10,10 @@ Projekt vznikl po aktualizaci macOS, kdy původní tisková fronta HP hlásila *
 
 **[Stáhnout instalátor](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest)** | [Instalace](#instalace) | [Kompatibilita](#kompatibilita-a-ověření) | [Nahlásit problém](https://github.com/ochodek/hp-laserjet-p1102-macos/issues)
 
+## Vývojová verze 1.7
+
+Tato větev přidává nativní nástroj pro toner a stav tiskárny, volby papíru a kvality, tichý režim, časovače a PDF nástroje pro brožury, vodoznaky a ruční duplex. Podrobnosti najdete v [přehledu funkcí](FEATURES.cs.md) a [zprávě z kontroly kódu](REVIEW.md). Jde o kandidáta k ověření, nikoli o plně prověřenou náhradu každého postupu HP. Publikovaná 1.6 zůstává stabilním základem popsaným níže.
+
 ## Instalace
 
 1. V části [Releases](https://github.com/ochodek/hp-laserjet-p1102-macos/releases/latest) stáhněte `HP-P1102-Native-1.6.pkg`. Nic nemusíte kompilovat.
@@ -74,7 +78,7 @@ cd hp-laserjet-p1102-macos
 ./package.sh
 ```
 
-`./build.sh` sestaví samotný filtr. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Osm testů ověřuje dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
+`./build.sh` v této větvi sestaví filtr, příkazový nástroj, CLI a obslužnou aplikaci. `./package.sh` spustí testy a vytvoří instalátor, zdrojový archiv a kontrolní součty ve složce `dist/`. Deset rastrových/protokolových testů a sady pro USB/XML a PDF ověřují dekódovaný obraz, kopie, šedé odstíny, geometrii a neplatné vstupy. Místní kontroly paměti a analýzu adaptéru popisuje [SECURITY.cs.md](SECURITY.cs.md).
 
 macOS vykreslí dokument do rastru; `src/rastertop1102.c` ověří jeho parametry a převede odstíny na čtyři úrovně tiskového bodu. Nezměněný kód **foo2zjs/JBIG-KIT** vytvoří ZjStream a systémový USB backend jej odešle do tiskárny. Instalovaný filtr se váže pouze na systémové `libcups` a `libSystem`. Viz [metoda měření odstínů](tests/TONE_REFERENCE.md) a [původ závislostí](vendor/UPSTREAM.txt).
 

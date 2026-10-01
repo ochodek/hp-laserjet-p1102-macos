@@ -9,6 +9,12 @@ if lpstat -v HP_LaserJet_P1102_Native >/dev/null 2>&1; then
 fi
 rm -f /Library/Printers/P1102Native/rastertop1102 /Library/Printers/P1102Native/LICENSE
 rm -f /Library/Printers/P1102Native/Source.tar.gz
+rm -f /Library/Printers/P1102Native/commandtop1102 /Library/Printers/P1102Native/p1102ctl
+app="/Applications/P1102 Utility.app"
+if [ -f "$app/Contents/Info.plist" ] && [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Contents/Info.plist")" = cz.marek.p1102-native.utility ]; then
+    rm -f "$app/Contents/MacOS/P1102Utility" "$app/Contents/Info.plist" "$app/Contents/_CodeSignature/CodeResources"
+    rmdir "$app/Contents/MacOS" "$app/Contents/_CodeSignature" "$app/Contents" "$app"
+fi
 rmdir /Library/Printers/P1102Native
 rm -f /Library/Printers/PPDs/Contents/Resources/HP-P1102-Native.ppd
 pkgutil --forget cz.marek.p1102-native

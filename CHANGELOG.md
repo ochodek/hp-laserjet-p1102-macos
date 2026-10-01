@@ -1,5 +1,9 @@
 # Changelog / Přehled vydání
 
+## 1.7 (validation candidate)
+
+Native USB toner/status utility and CUPS ReportLevels; additional media, paper sizes, custom sizes, FastRes quality, EconoMode, density and jam recovery. Native power/quiet controls, internal-page commands, privacy-limited diagnostics, PDF watermark/booklet and manual duplex. Default print data retain 1.6 calibration. Physical validation and scheduler integration gates are tracked in [REVIEW.md](REVIEW.md).
+
 ## 1.6, 2026-10-01
 
 First public release of this vibe-coded community project.

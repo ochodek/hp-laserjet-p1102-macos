@@ -13,3 +13,11 @@ xcrun clang -arch arm64 -O1 -g -std=c11 -fsanitize=address,undefined \
     -lcups -o build/sanitized/rastertop1102
 P1102_TEST_FILTER="$PWD/build/sanitized/rastertop1102" \
     UBSAN_OPTIONS=halt_on_error=1 ASAN_OPTIONS=detect_leaks=0 python3 tests/test_driver.py
+xcrun clang -arch arm64 -O1 -g -fobjc-arc -fsanitize=address,undefined \
+    -fno-omit-frame-pointer src/device.m tests/device_tests.m -framework Foundation \
+    -o build/sanitized/device-tests
+UBSAN_OPTIONS=halt_on_error=1 ASAN_OPTIONS=detect_leaks=0 build/sanitized/device-tests
+xcrun clang -arch arm64 -O1 -g -fobjc-arc -fsanitize=address,undefined \
+    -fno-omit-frame-pointer src/pdf-tools.m tests/pdf_tests.m -framework Cocoa -framework PDFKit \
+    -o build/sanitized/pdf-tests
+UBSAN_OPTIONS=halt_on_error=1 ASAN_OPTIONS=detect_leaks=0 build/sanitized/pdf-tests

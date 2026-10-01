@@ -13,9 +13,9 @@ import json
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def run_filter(raster):
+def run_filter(raster, options=""):
     return subprocess.run([os.environ.get('P1102_TEST_FILTER', str(ROOT / 'build/rastertop1102')), '1', 'test',
-                           'test', '1', ''], input=raster, capture_output=True)
+                           'test', '1', options], input=raster, capture_output=True)
 
 
 def read_image(image):
@@ -28,6 +28,38 @@ def read_image(image):
 
 
 class DriverTests(unittest.TestCase):
+    def test_job_options_reach_the_printer_without_changing_the_calibrated_default(self):
+        raster = subprocess.check_output([str(ROOT / 'build/raster_fixture'), '8', '0'])
+        for options, density, economy, recovery in [('',3,'OFF','OFF'),('pjlDensity=5 EconoMode=True pjlJamRecovery=True',5,'ON','AUTO')]:
+            result = run_filter(raster, options)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            for command in [f'@PJL SET DENSITY={density}', f'@PJL SET ECONOMODE={economy}', f'@PJL SET JAMRECOVERY={recovery}']:
+                self.assertIn(command.encode(), result.stdout)
+        for options in ['pjlDensity=0','pjlDensity=6','pjlDensity=3x','EconoMode=Maybe','pjlJamRecovery=invalid','P1102ShiftX=-16','P1102ShiftX=69','P1102ShiftY=1']:
+            result = run_filter(raster, options)
+            self.assertEqual(result.returncode, 1, options)
+            self.assertEqual(result.stdout, b'')
+
+    def test_supported_media_and_quality_match_hp_protocol_codes(self):
+        media = [1,2,258,282,262,283,265,513,267,514,515,512,260,516,263,273]
+        papers = [(595,842,9),(420,595,11),(297,420,70),(612,792,1),(612,1008,5),
+                  (522,756,7),(612,936,41),(516,729,0),(553,765,0),(522,737,0),
+                  (558,774,0),(284,419,43),(567,420,69),(297,684,20),(279,540,37),
+                  (499,709,34),(459,649,28),(312,624,27),(300,500,0)]
+        for i,(w,h,code) in enumerate(papers):
+            m=media[i % len(media)]; source=4 if i%2 else 7; quality=1 if i%2 else 401
+            raster=subprocess.check_output([str(ROOT/'build/raster_fixture'),'8','0','options',str(w),str(h),str(m),str(source),str(quality)])
+            result=run_filter(raster)
+            self.assertEqual(result.returncode,0,result.stderr)
+            with tempfile.TemporaryDirectory() as d:
+                path=Path(d)/'job.zjs';path.write_bytes(result.stdout)
+                decoded=subprocess.check_output([str(ROOT/'build/zjsdecode'),str(path)],text=True)
+            for key,value in [('DMPAPER',code),('DMMEDIATYPE',m),('DMDEFAULTSOURCE',source),('RESOLUTION_Y',600 if quality==1 else 400)]:
+                self.assertIn(f'ZJI_{key}, {value} ',decoded)
+        for w,h,m,source,quality in [(215,500,1,7,401),(613,500,1,7,401),(300,359,1,7,401),(300,1009,1,7,401),(300,500,999,7,401),(300,500,1,2,401),(300,500,1,7,999)]:
+            raster=subprocess.check_output([str(ROOT/'build/raster_fixture'),'8','0','options',str(w),str(h),str(m),str(source),str(quality)])
+            self.assertEqual(run_filter(raster).returncode,1)
+
     def test_spatial_tones_match_hp_on_an_image_not_used_for_calibration(self):
         reference = json.loads((ROOT / 'tests/hp-spatial-reference.json').read_text())
         for color in [0, 3]:

@@ -14,5 +14,5 @@ if [ -n "$uri" ]; then
     /usr/sbin/lpadmin -p "$queue" -E -v "$uri" -P "$ppd" \
         -D 'HP LaserJet P1102 Native' -o printer-is-shared=false
 else
-    printf '%s\n' 'Driver installed. Connect P1102 and add it in Printers & Scanners using HP LaserJet P1102 Native ARM64, 1.6.'
+    printf '%s\n' 'Driver installed. Connect P1102 and add it in Printers & Scanners using HP LaserJet P1102 Native ARM64, 1.7.'
 fi
